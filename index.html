@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Our NYC</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    
+    <style>
+        :root {
+            --pink-overlay-opacity: 0.25;
+            --pink-color: rgba(255, 182, 193, var(--pink-overlay-opacity));
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            touch-action: none;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            background-color: #0a0a0a;
+        }
+        
+        /* Leaflet controls */
+        .leaflet-control-attribution {
+            background: rgba(0, 0, 0, 0.7) !important;
+            color: #fff !important;
+            font-size: 10px !important;
+            padding: 2px 6px !important;
+        }
+        
+        .leaflet-control-attribution a {
+            color: #ccc !important;
+        }
+        
+        .leaflet-control-zoom a {
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: #fff !important;
+            border: 1px solid #333 !important;
+        }
+        
+        .leaflet-control-zoom a:hover {
+            background: rgba(0, 0, 0, 0.9) !important;
+        }
+        
+        /* Custom marker styling */
+        .custom-marker {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff85c1 100%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            border: 3px solid #fff;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.5), 0 2px 5px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: markerPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes markerPulse {
+            0%, 100% {
+                box-shadow: 0 4px 15px rgba(255, 105, 180, 0.5), 0 2px 5px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 25px rgba(255, 105, 180, 0.8), 0 2px 10px rgba(0, 0, 0, 0.4);
+            }
+        }
+        
+        .custom-marker:hover {
+            transform: rotate(-45deg) scale(1.15);
+            box-shadow: 0 6px 25px rgba(255, 105, 180, 0.8), 0 3px 10px rgba(0, 0, 0, 0.4);
+        }
+        
+        .custom-marker::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Custom popup styling */
+        .leaflet-popup-content-wrapper {
+            background: linear-gradient(135deg, #fff 0%, #ffe8f0 100%) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25), 0 4px 15px rgba(255, 105, 180, 0.2) !important;
+            border: 1px solid rgba(255, 182, 193, 0.3) !important;
+            animation: popupFadeIn 0.4s ease-out !important;
+        }
+        
+        @keyframes popupFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .leaflet-popup-content {
+            margin: 18px !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
+        }
+        
+        .leaflet-popup-content h3 {
+            background: linear-gradient(135deg, #ff69b4, #d63384);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 20px;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        
+        .leaflet-popup-content p {
+            color: #555;
+            font-size: 14px;
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        .leaflet-popup-content .description {
+            color: #444;
+            font-size: 14px;
+            margin: 10px 0;
+            line-height: 1.6;
+            padding: 8px;
+            background: rgba(255, 182, 193, 0.1);
+            border-radius: 6px;
+        }
+        
+        .leaflet-popup-content .quote {
+            color: #666;
+            font-size: 13px;
+            font-style: italic;
+            margin: 10px 0 5px 0;
+            padding-left: 10px;
+            border-left: 3px solid #ffb6c1;
+            line-height: 1.5;
+        }
+        
+        .leaflet-popup-tip {
+            background: #ffe8f0 !important;
+        }
+        
+        /* Header */
+        #header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 3;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 15px 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            animation: slideInLeft 0.8s ease-out;
+        }
+        
+        @keyframes slideInLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        #header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.6), 0 4px 30px rgba(255, 105, 180, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        /* Hint */
+        #hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 14px 28px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            z-index: 3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            animation: slideInUp 0.8s ease-out;
+        }
+        
+        @keyframes slideInUp {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+        
+        #hint:active {
+            opacity: 0.7;
+        }
+        
+        #hint.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Category toggles */
+        #category-toggles {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 280px;
+            animation: slideInRight 0.8s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            0% {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .category-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .category-toggle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .category-toggle:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .category-toggle:active {
+            transform: scale(0.96);
+        }
+        
+        .category-toggle.active {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff85c1 50%, #ffa5d8 100%);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #fff;
+            box-shadow: 0 6px 25px rgba(255, 105, 180, 0.5), 0 2px 10px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+        
+        .category-toggle.inactive {
+            opacity: 0.5;
+            background: rgba(200, 200, 200, 0.8);
+            border-color: #999;
+            color: #666;
+        }
+        
+        /* Time of day toggles */
+        #time-toggles {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 15px;
+            border-radius: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            animation: slideInDown 0.8s ease-out;
+        }
+        
+        @keyframes slideInDown {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+        
+        .time-toggle {
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .time-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        .time-toggle.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .time-toggle.inactive {
+            opacity: 0.4;
+            background: rgba(200, 200, 200, 0.7);
+            border-color: #999;
+            color: #666;
+        }
+        
+        /* Landing page */
+        #landing-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(-45deg, #ff6b7a, #ffa8b3, #ffb8c5, #ff85a1, #ff6b7a);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease, visibility 1s ease;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+        }
+        
+        #landing-page.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Floating hearts */
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0;
+            animation: floatUp 8s ease-in infinite;
+        }
+        
+        @keyframes floatUp {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(0deg) scale(0.5);
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) rotate(360deg) scale(1.2);
+            }
+        }
+        
+        /* Sparkles */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        #landing-page .content {
+            text-align: center;
+            padding: 40px;
+            max-width: 90%;
+            position: relative;
+            z-index: 2;
+        }
+        
+        #landing-page h1 {
+            font-size: 64px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 60px rgba(255, 255, 255, 0.5);
+            letter-spacing: 3px;
+            animation: fadeInDown 1.5s ease-out;
+        }
+        
+        @keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #landing-page .subtitle {
+            font-size: 28px;
+            font-weight: 400;
+            color: #ffffff;
+            text-shadow: 0 3px 15px rgba(0, 0, 0, 0.35), 0 1px 5px rgba(0, 0, 0, 0.25);
+            line-height: 1.6;
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+            font-style: italic;
+            animation: fadeInUp 1.5s ease-out 0.5s backwards;
+        }
+        
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #landing-page .tap-hint {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: pulse 2s ease-in-out infinite, fadeIn 1.5s ease-out 1s backwards;
+            padding: 14px 35px;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.25);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing page -->
+    <div id="landing-page" onclick="hideLanding()">
+        <div class="content">
+            <h1>Our New York</h1>
+            <div class="subtitle">A Map of Possibility</div>
+            <div class="tap-hint">Tap to Begin</div>
+        </div>
+    </div>
+    
+    <!-- Map container -->
+    <div id="map"></div>
+    
+    <!-- Time of day toggles -->
+    <div id="time-toggles">
+        <div class="time-toggle active" data-time="day" onclick="toggleTime('day')">
+            ☀️ Day
+        </div>
+        <div class="time-toggle active" data-time="night" onclick="toggleTime('night')">
+            🌙 Night
+        </div>
+        <div class="time-toggle active" data-time="both" onclick="toggleTime('both')">
+            🌅 Anytime
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <div id="header">
+        <h1>Our NYC</h1>
+    </div>
+    
+    <!-- Category toggles -->
+    <div id="category-toggles">
+        <div class="category-toggle active" data-category="nature" onclick="toggleCategory('nature')">
+            🌸 Blossoming Love
+        </div>
+        <div class="category-toggle active" data-category="views" onclick="toggleCategory('views')">
+            🌅 Golden Hour
+        </div>
+        <div class="category-toggle active" data-category="culture" onclick="toggleCategory('culture')">
+            🎨 Cultural Connection
+        </div>
+        <div class="category-toggle active" data-category="adventure" onclick="toggleCategory('adventure')">
+            ✨ Adventure Together
+        </div>
+        <div class="category-toggle active" data-category="treats" onclick="toggleCategory('treats')">
+            🍰 Sweet Moments
+        </div>
+    </div>
+    
+    <!-- Hint -->
+    <div id="hint" onclick="this.classList.add('hidden')">
+        Drag to pan · Pinch to zoom
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    
+    <script>
+        // Create floating hearts animation
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDelay = Math.random() * 8 + 's';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            document.getElementById('landing-page').appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 8000);
+        }
+        
+        // Create sparkles animation
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = Math.random() * 100 + 'vw';
+            sparkle.style.top = Math.random() * 100 + 'vh';
+            sparkle.style.animationDelay = Math.random() * 3 + 's';
+            document.getElementById('landing-page').appendChild(sparkle);
+            
+            setTimeout(() => sparkle.remove(), 3000);
+        }
+        
+        // Generate hearts and sparkles
+        for (let i = 0; i < 15; i++) {
+            setTimeout(createHeart, i * 600);
+        }
+        
+        for (let i = 0; i < 30; i++) {
+            setTimeout(createSparkle, i * 300);
+        }
+        
+        // Continue creating hearts and sparkles
+        setInterval(createHeart, 800);
+        setInterval(createSparkle, 400);
+        
+        // Hide landing page function
+        function hideLanding() {
+            const landing = document.getElementById('landing-page');
+            landing.classList.add('hidden');
+        }
+        
+        // Initialize the map centered on Manhattan, NYC
+        const map = L.map('map', {
+            center: [40.7580, -73.9855], // Times Square area
+            zoom: 13,
+            zoomControl: true,
+            attributionControl: true,
+            minZoom: 11,
+            maxZoom: 18,
+            // Enable touch interactions
+            tap: true,
+            touchZoom: true,
+            dragging: true,
+            doubleClickZoom: true
+        });
+        
+        // Add dark OpenStreetMap tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            maxZoom: 19,
+            subdomains: 'abcd'
+        }).addTo(map);
+        
+        // Define all locations with addresses and categories
+        const locations = [
+            {
+                name: 'Cherry Blossoms',
+                place: 'Roosevelt Island',
+                description: 'I want to see the first signs of spring with you.',
+                fullName: 'Franklin D. Roosevelt Four Freedoms Park',
+                address: '1 FDR Four Freedoms Park, New York, NY 10044',
+                coords: [40.749864, -73.961200],
+                category: 'nature',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Picnic',
+                place: 'Central Park',
+                fullName: 'Sheep Meadow',
+                address: 'Sheep Meadow, Central Park, New York, NY 10019',
+                coords: [40.771000, -73.974000],
+                category: 'nature',
+                description: 'A 15-acre lawn in Central Park where New Yorkers gather to sunbathe, picnic, and relax. Bring a blanket, some treats, and enjoy the city skyline surrounding this peaceful green oasis.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Sunset',
+                place: 'Hudson River',
+                fullName: '79th Street Boat Basin',
+                address: 'W 79th St, New York, NY 10024',
+                coords: [40.784660, -73.981900],
+                category: 'views',
+                description: 'A hidden gem along the Hudson River with a marina, café, and stunning sunset views. Watch the sky turn pink and orange as boats bob in the water and the city lights begin to twinkle.',
+                timeOfDay: 'both'
+            },
+            {
+                name: 'Outdoor Music',
+                place: 'Central Park',
+                fullName: 'Naumburg Bandshell',
+                address: 'Naumburg Bandshell, Central Park, New York, NY 10021',
+                coords: [40.772667, -73.971333],
+                category: 'culture',
+                description: 'An iconic outdoor amphitheater hosting free concerts and performances throughout the warmer months. Sit on the grass and let live music fill the air as you enjoy a perfect NYC evening together.',
+                timeOfDay: 'both'
+            },
+            {
+                name: 'Get Lost in the West Village',
+                place: 'West Village',
+                fullName: 'Washington Square Park',
+                address: 'Washington Square, New York, NY 10012',
+                coords: [40.730824, -73.997330],
+                category: 'adventure',
+                description: 'Start at the iconic arch and wander through charming cobblestone streets lined with brownstones, hidden gardens, and cozy cafés. The West Village is made for getting delightfully lost together.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Ferry Ride "to nowhere"',
+                place: 'Manhattan',
+                fullName: 'Staten Island Ferry / Whitehall Terminal',
+                address: '4 Whitehall St, New York, NY 10004',
+                coords: [40.7013332, -74.0133104],
+                category: 'adventure',
+                description: 'The free Staten Island Ferry offers breathtaking views of the Statue of Liberty, Ellis Island, and the Manhattan skyline. It\'s a 25-minute journey each way—perfect for an unexpected mini-adventure.',
+                timeOfDay: 'both'
+            },
+            {
+                name: 'Chelsea Galleries',
+                place: 'Chelsea',
+                fullName: 'Gladstone Gallery',
+                address: '530 W 21st St, New York, NY 10011',
+                coords: [40.7489324, -74.0044772],
+                category: 'culture',
+                description: 'Chelsea is home to hundreds of contemporary art galleries. Spend an afternoon hopping between exhibitions—from cutting-edge installations to thought-provoking photography. Most are free to enter.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Indie Film Night',
+                place: 'Greenwich Village',
+                fullName: 'IFC Center',
+                address: '323 6th Ave, New York, NY 10014',
+                coords: [40.7312056, -74.0016722],
+                category: 'culture',
+                description: 'A beloved indie cinema showing art-house films, foreign cinema, and documentaries. Grab tickets to something you\'ve never heard of and discover a new favorite film together.',
+                timeOfDay: 'both'
+            },
+            {
+                name: 'Coney Island Early Season',
+                place: 'Coney Island',
+                fullName: 'Luna Park',
+                address: '1000 Surf Ave, Brooklyn, NY 11224',
+                coords: [40.575245, -73.978577],
+                category: 'adventure',
+                description: 'NYC\'s iconic seaside amusement park with vintage rides, boardwalk games, and Nathan\'s Famous hot dogs. Visit early in the season for smaller crowds and that nostalgic carnival magic.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Late-Night Dessert',
+                place: 'East Village',
+                fullName: "Veniero's Pasticceria & Caffé",
+                address: '342 E 11th St, New York, NY 10003',
+                coords: [40.7294715, -73.9844822],
+                category: 'treats',
+                description: 'A legendary Italian bakery serving classic pastries since 1894. Their cannoli, sfogliatelle, and tiramisu are perfect for satisfying late-night sweet cravings in the cozy, old-world atmosphere.',
+                timeOfDay: 'night'
+            },
+            {
+                name: 'Brooklyn Botanic Garden in Spring',
+                place: 'Brooklyn',
+                fullName: 'Brooklyn Botanic Garden',
+                address: '990 Washington Ave, Brooklyn, NY 11225',
+                coords: [40.668, -73.964],
+                category: 'nature',
+                description: 'A 52-acre botanical paradise with themed gardens including a famous cherry esplanade and Japanese garden. In spring, thousands of flowers bloom creating a breathtaking, romantic escape from the city.',
+                quote1: 'Flowers just beginning to open.',
+                quote2: 'I want to walk slowly with you while everything feels like it\'s waking up.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'The Met Cloisters',
+                place: 'Fort Tryon Park',
+                fullName: 'The Met Cloisters',
+                address: '99 Margaret Corbin Dr, New York, NY 10040',
+                coords: [40.865, -73.932],
+                category: 'culture',
+                description: 'A branch of the Met dedicated to medieval European art and architecture. Built from actual medieval cloisters, the museum overlooks the Hudson River and feels like a castle transported to NYC.',
+                quote1: 'Stone walls, river views, silence.',
+                quote2: 'It feels like stepping into another century together.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Flea Market Day',
+                place: 'Brooklyn',
+                fullName: 'Brooklyn Flea (Dumbo)',
+                address: '90 Kent Ave, Brooklyn, NY 11249',
+                coords: [40.706, -73.963],
+                category: 'adventure',
+                description: 'A beloved weekend market with vintage finds, antiques, handmade goods, and food vendors. Browse through treasures and quirky discoveries while enjoying the vibrant Brooklyn atmosphere.',
+                quote1: 'Old objects, strange treasures.',
+                quote2: 'I like the idea of finding something meaningless that becomes ours.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Brooklyn Bridge at Sunrise',
+                place: 'Brooklyn Bridge',
+                fullName: 'Brooklyn Bridge Pedestrian Path',
+                address: 'Brooklyn Bridge, New York, NY 10038',
+                coords: [40.706, -74.003],
+                category: 'views',
+                description: 'Walk across the iconic 1883 bridge as the sun rises over the East River. Early morning offers peace, golden light, and stunning views of Manhattan—a moment that feels entirely yours.',
+                quote1: 'Almost empty, soft light, quiet city.',
+                quote2: 'I want one morning that feels like it belongs only to us.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Shakespeare in the Park',
+                place: 'Central Park',
+                fullName: 'Delacorte Theater',
+                address: 'Delacorte Theater, Central Park, New York, NY 10024',
+                coords: [40.779, -73.966],
+                category: 'culture',
+                description: 'Free outdoor performances of Shakespeare and other plays under the stars. Arrive early to get tickets, bring a blanket, and experience theater in one of NYC\'s most magical settings.',
+                quote1: 'Blankets, crowds, night air.',
+                quote2: 'I want to sit beside you while a story unfolds above us.',
+                timeOfDay: 'night'
+            },
+            {
+                name: 'Café-Hopping in SoHo',
+                place: 'SoHo',
+                fullName: 'SoHo Neighborhood',
+                address: 'SoHo, New York, NY 10012',
+                coords: [40.723, -74.000],
+                category: 'treats',
+                description: 'Explore SoHo\'s trendy streets lined with boutiques, cast-iron buildings, and cozy cafés. Make it a slow day—espresso here, pastry there, people-watching everywhere.',
+                quote1: 'One drink becomes another.',
+                quote2: 'I want a day where we linger and don\'t rush anything.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Museum of the City of New York',
+                place: 'Upper East Side',
+                fullName: 'Museum of the City of New York',
+                address: '1220 5th Ave, New York, NY 10029',
+                coords: [40.792, -73.952],
+                category: 'culture',
+                description: 'Discover the rich history of NYC through photographs, artifacts, and interactive exhibits. Learn about the city\'s evolution from Dutch colony to global metropolis—perfect for curious minds.',
+                quote1: 'Stories of how this place became what it is.',
+                quote2: 'I like learning a city with you instead of just walking through it.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Kayaking on the Hudson',
+                place: 'Hudson River Park',
+                fullName: 'Hudson River Park (Pier 26)',
+                address: 'Pier 26, Hudson River Park, New York, NY 10013',
+                coords: [40.718, -74.014],
+                category: 'adventure',
+                description: 'Free kayaking programs let you paddle along the Hudson with the Manhattan skyline as your backdrop. No experience needed—just adventure and a unique perspective of the city.',
+                quote1: 'Water close, skyline far.',
+                quote2: 'I want to see the city from somewhere unexpected with you.',
+                timeOfDay: 'day'
+            },
+            {
+                name: 'Live Vinyl / Listening Bar Night',
+                place: 'Greenwich Village',
+                fullName: 'Village Vanguard',
+                address: '178 7th Ave S, New York, NY 10014',
+                coords: [40.738, -74.002],
+                category: 'culture',
+                description: 'A legendary jazz club that\'s been hosting world-class musicians since 1935. Sit in the intimate basement venue and let the music transport you—no phones, just pure listening.',
+                quote1: 'Music you don\'t know yet.',
+                quote2: 'I want to discover new sounds while sitting close to you.',
+                timeOfDay: 'night'
+            },
+            {
+                name: 'Photo Walk in DUMBO',
+                place: 'DUMBO',
+                fullName: 'DUMBO (Down Under the Manhattan Bridge)',
+                address: 'DUMBO, Brooklyn, NY 11201',
+                coords: [40.703, -73.989],
+                category: 'views',
+                description: 'Photogenic cobblestone streets with the Manhattan Bridge perfectly framed at every turn. Golden hour here is magical—capture the beauty or just soak it in together.',
+                quote1: 'Cobbled streets, bridges, light.',
+                quote2: 'I want a day that feels like we\'re inside a photograph.',
+                timeOfDay: 'both'
+            },
+            {
+                name: 'Planetarium Show',
+                place: 'Upper West Side',
+                fullName: 'Hayden Planetarium (AMNH)',
+                address: 'Central Park West & 79th St, New York, NY 10024',
+                coords: [40.781, -73.974],
+                category: 'culture',
+                description: 'Journey through the cosmos in this state-of-the-art planetarium. Watch stars, planets, and galaxies unfold above you in immersive shows that make the universe feel intimate and infinite.',
+                quote1: 'Dark room, moving stars.',
+                quote2: 'I want one moment where the world feels bigger and it\'s still just us.',
+                timeOfDay: 'both'
+            },
+            {
+                name: 'Wine Bar Tucked Away',
+                place: 'West Village',
+                fullName: 'Hidden Wine Bar',
+                address: 'West Village, New York, NY 10014',
+                coords: [40.733, -74.003],
+                category: 'treats',
+                description: 'Find a quiet wine bar down a side street—candlelit, intimate, with a carefully curated wine list. The kind of place where conversation flows as smoothly as the wine.',
+                quote1: 'Low light, quiet conversations.',
+                quote2: 'I like nights that feel intimate without trying to be.',
+                timeOfDay: 'night'
+            },
+            {
+                name: 'Arcade / Board Game Café',
+                place: 'Williamsburg',
+                fullName: 'Barcade',
+                address: '388 Union Ave, Brooklyn, NY 11211',
+                coords: [40.712, -73.951],
+                category: 'adventure',
+                description: 'Classic arcade games meet craft beer in this nostalgic hangout. Challenge each other to Pac-Man, pinball, and retro games—let your competitive (and playful) sides shine.',
+                quote1: 'Playful, competitive, laughing too much.',
+                quote2: 'I want to see your serious face over something that doesn\'t matter.',
+                timeOfDay: 'both'
+            },
+            {
+                name: 'Beach Evening at Rockaway',
+                place: 'Rockaway Beach',
+                fullName: 'Rockaway Beach',
+                address: 'Beach 97th St, Rockaway Beach, NY 11693',
+                coords: [40.583, -73.823],
+                category: 'views',
+                description: 'NYC\'s best beach is just a train ride away. Watch the sunset over the Atlantic, feel the salt air, and remember that sometimes the city needs the ocean.',
+                quote1: 'Wind, ocean, nothing else.',
+                quote2: 'I want to sit beside you and listen to waves instead of the city.',
+                timeOfDay: 'both'
+            },
+            {
+                name: 'Write Notes to Each Other in a Park',
+                place: 'Central Park',
+                fullName: 'The Mall (Central Park)',
+                address: 'The Mall, Central Park, New York, NY 10022',
+                coords: [40.771, -73.972],
+                category: 'nature',
+                description: 'The tree-lined promenade in Central Park is perfect for a quiet afternoon. Bring paper and pens, find a bench, and write notes, thoughts, or letters to each other—words to save and remember.',
+                quote1: 'I want to leave you words you can keep.',
+                timeOfDay: 'day'
+            }
+        ];
+        
+        // Create custom marker icon
+        const customIcon = L.divIcon({
+            className: 'custom-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+        
+        // Store markers by category and time
+        const markersByCategory = {};
+        const markersByTime = {};
+        const activeCategories = new Set(['nature', 'views', 'culture', 'adventure', 'treats']);
+        const activeTimes = new Set(['day', 'night', 'both']);
+        
+        // Add markers to map
+        locations.forEach(location => {
+            let popupContent = `
+                <h3>${location.name}</h3>
+                <p><strong>${location.fullName}</strong><br>
+                ${location.place}<br>
+                <em style="font-size: 12px; color: #888;">${location.address}</em></p>
+            `;
+            
+            // Add description if it exists
+            if (location.description) {
+                popupContent += `
+                    <div class="description">${location.description}</div>
+                `;
+            }
+            
+            // Add quotes if they exist
+            if (location.quote1 && location.quote2) {
+                popupContent += `
+                    <div class="quote">"${location.quote1}"</div>
+                    <div class="quote">"${location.quote2}"</div>
+                `;
+            }
+            
+            const marker = L.marker(location.coords, { icon: customIcon })
+                .addTo(map)
+                .bindPopup(popupContent);
+            
+            // Store marker by category
+            if (!markersByCategory[location.category]) {
+                markersByCategory[location.category] = [];
+            }
+            markersByCategory[location.category].push(marker);
+            
+            // Store marker by time of day
+            if (!markersByTime[location.timeOfDay]) {
+                markersByTime[location.timeOfDay] = [];
+            }
+            markersByTime[location.timeOfDay].push(marker);
+        });
+        
+        // Toggle category function
+        window.toggleCategory = function(category) {
+            const toggle = document.querySelector(`[data-category="${category}"]`);
+            
+            if (activeCategories.has(category)) {
+                // Deactivate
+                activeCategories.delete(category);
+                toggle.classList.remove('active');
+                toggle.classList.add('inactive');
+            } else {
+                // Activate
+                activeCategories.add(category);
+                toggle.classList.remove('inactive');
+                toggle.classList.add('active');
+            }
+            
+            // Update marker visibility based on active times and categories
+            updateMarkerVisibility();
+        };
+        
+        // Toggle time of day function
+        window.toggleTime = function(time) {
+            const toggle = document.querySelector(`[data-time="${time}"]`);
+            
+            if (activeTimes.has(time)) {
+                // Deactivate
+                activeTimes.delete(time);
+                toggle.classList.remove('active');
+                toggle.classList.add('inactive');
+            } else {
+                // Activate
+                activeTimes.add(time);
+                toggle.classList.remove('inactive');
+                toggle.classList.add('active');
+            }
+            
+            // Update marker visibility based on active times and categories
+            updateMarkerVisibility();
+        };
+        
+        // Update marker visibility based on both category and time filters
+        function updateMarkerVisibility() {
+            locations.forEach((location, index) => {
+                const categoryActive = activeCategories.has(location.category);
+                const timeActive = activeTimes.has(location.timeOfDay);
+                const shouldShow = categoryActive && timeActive;
+                
+                // Get all markers for this location
+                const categoryMarkers = markersByCategory[location.category] || [];
+                const timeMarkers = markersByTime[location.timeOfDay] || [];
+                
+                // Find the marker that belongs to this location
+                categoryMarkers.forEach(marker => {
+                    if (timeMarkers.includes(marker)) {
+                        if (shouldShow) {
+                            if (!map.hasLayer(marker)) {
+                                marker.addTo(map);
+                            }
+                        } else {
+                            map.removeLayer(marker);
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Auto-hide hint after 5 seconds
+        setTimeout(() => {
+            const hint = document.getElementById('hint');
+            hint.classList.add('hidden');
+        }, 5000);
+        
+        // Prevent page zoom on double-tap (iOS Safari)
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
