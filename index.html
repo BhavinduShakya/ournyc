@@ -40,6 +40,95 @@
             height: 100vh;
             z-index: 1;
             background-color: #0a0a0a;
+            transition: filter 1.2s ease, opacity 0.8s ease;
+        }
+        
+        /* Blur overlay for cinematic focus - sits above map but below popup */
+        #map::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 400;
+            backdrop-filter: blur(0px) brightness(1);
+            -webkit-backdrop-filter: blur(0px) brightness(1);
+            transition: backdrop-filter 0.8s ease;
+            opacity: 0;
+        }
+        
+        #map.popup-active::before {
+            backdrop-filter: blur(3px) brightness(0.85);
+            -webkit-backdrop-filter: blur(3px) brightness(0.85);
+            opacity: 1;
+        }
+        
+        #map.popup-active.atmosphere-day::before {
+            backdrop-filter: blur(3px) brightness(0.92);
+            -webkit-backdrop-filter: blur(3px) brightness(0.92);
+        }
+        
+        #map.popup-active.atmosphere-night::before {
+            backdrop-filter: blur(3px) brightness(0.78);
+            -webkit-backdrop-filter: blur(3px) brightness(0.78);
+        }
+        
+        /* Atmospheric modes */
+        #map.atmosphere-day {
+            filter: brightness(1.08) saturate(1.05) sepia(0.08);
+        }
+        
+        #map.atmosphere-night {
+            filter: brightness(0.92) saturate(0.95) hue-rotate(-5deg) contrast(1.08);
+        }
+        
+        #map.atmosphere-anytime {
+            filter: brightness(1) saturate(1);
+        }
+        
+        /* Atmospheric overlay for subtle tinting */
+        #map::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 2;
+            transition: background 1.2s ease, opacity 0.8s ease;
+            opacity: 0;
+        }
+        
+        #map.atmosphere-day::after {
+            background: radial-gradient(circle at 50% 30%, rgba(255, 245, 220, 0.08) 0%, transparent 60%);
+            opacity: 1;
+        }
+        
+        #map.atmosphere-night::after {
+            background: radial-gradient(circle at 50% 50%, rgba(30, 40, 80, 0.12) 0%, transparent 70%);
+            opacity: 1;
+        }
+        
+        /* Soft vignette for emotional focus */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 999;
+            background: radial-gradient(circle at 50% 50%, transparent 0%, transparent 40%, rgba(0, 0, 0, 0.15) 100%);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        
+        body.popup-open::before {
+            opacity: 1;
         }
         
         /* Leaflet controls */
@@ -92,6 +181,111 @@
             box-shadow: 0 6px 25px rgba(255, 105, 180, 0.8), 0 3px 10px rgba(0, 0, 0, 0.4);
         }
         
+        /* Day mode pins - warm glow */
+        .custom-marker.pin-day {
+            box-shadow: 0 4px 15px rgba(255, 180, 150, 0.6), 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .custom-marker.pin-day::after {
+            box-shadow: 0 0 20px rgba(255, 200, 180, 0.4);
+        }
+        
+        @keyframes markerPulseDay {
+            0%, 100% {
+                box-shadow: 0 4px 15px rgba(255, 180, 150, 0.6), 0 2px 5px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 25px rgba(255, 180, 150, 0.9), 0 2px 10px rgba(0, 0, 0, 0.4);
+            }
+        }
+        
+        .custom-marker.pin-day {
+            animation: markerPulseDay 2s ease-in-out infinite;
+        }
+        
+        /* Night mode pins - cooler lavender glow */
+        .custom-marker.pin-night {
+            box-shadow: 0 4px 18px rgba(200, 150, 255, 0.65), 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .custom-marker.pin-night::after {
+            box-shadow: 0 0 25px rgba(220, 180, 255, 0.5);
+        }
+        
+        @keyframes markerPulseNight {
+            0%, 100% {
+                box-shadow: 0 4px 18px rgba(200, 150, 255, 0.65), 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 30px rgba(200, 150, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 30px rgba(200, 150, 255, 0.95), 0 2px 12px rgba(0, 0, 0, 0.5), 0 0 45px rgba(200, 150, 255, 0.5);
+            }
+        }
+        
+        .custom-marker.pin-night {
+            animation: markerPulseNight 2s ease-in-out infinite;
+        }
+        
+        /* Anytime mode - default pink glow */
+        .custom-marker.pin-anytime {
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.5), 0 2px 5px rgba(0, 0, 0, 0.3);
+            animation: markerPulse 2s ease-in-out infinite;
+        }
+        
+        /* Emotional states for pins */
+        /* Soft mood - gentle, calmer glow */
+        .custom-marker.mood-soft {
+            animation: markerPulseSoft 3s ease-in-out infinite;
+        }
+        
+        @keyframes markerPulseSoft {
+            0%, 100% {
+                box-shadow: 0 3px 12px rgba(255, 192, 203, 0.4), 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                box-shadow: 0 4px 18px rgba(255, 192, 203, 0.6), 0 2px 8px rgba(0, 0, 0, 0.25);
+            }
+        }
+        
+        /* Electric mood - brighter, more energetic glow */
+        .custom-marker.mood-electric {
+            animation: markerPulseElectric 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes markerPulseElectric {
+            0%, 100% {
+                box-shadow: 0 5px 20px rgba(255, 69, 180, 0.7), 0 3px 8px rgba(0, 0, 0, 0.35), 0 0 30px rgba(255, 69, 180, 0.4);
+            }
+            50% {
+                box-shadow: 0 6px 30px rgba(255, 69, 180, 1), 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 45px rgba(255, 69, 180, 0.6);
+            }
+        }
+        
+        /* Intimate mood - focused, warm glow */
+        .custom-marker.mood-intimate {
+            animation: markerPulseIntimate 2.5s ease-in-out infinite;
+        }
+        
+        @keyframes markerPulseIntimate {
+            0%, 100% {
+                box-shadow: 0 4px 16px rgba(255, 140, 170, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 25px rgba(255, 140, 170, 0.3);
+            }
+            50% {
+                box-shadow: 0 5px 24px rgba(255, 140, 170, 0.75), 0 3px 10px rgba(0, 0, 0, 0.35), 0 0 35px rgba(255, 140, 170, 0.45);
+            }
+        }
+        
+        /* Smooth fade for inactive pins */
+        .custom-marker.faded {
+            opacity: 0.25;
+            transform: rotate(-45deg) scale(0.85);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .custom-marker {
+            opacity: 1;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
         .custom-marker::after {
             content: '';
             width: 14px;
@@ -111,6 +305,13 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25), 0 4px 15px rgba(255, 105, 180, 0.2) !important;
             border: 1px solid rgba(255, 182, 193, 0.3) !important;
             animation: popupFadeIn 0.4s ease-out !important;
+            transition: box-shadow 0.6s ease, transform 0.3s ease !important;
+        }
+        
+        /* Enhanced popup during focus mode */
+        body.popup-open .leaflet-popup-content-wrapper {
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 8px 25px rgba(255, 105, 180, 0.3), 0 0 80px rgba(255, 105, 180, 0.15) !important;
+            transform: scale(1.02);
         }
         
         @keyframes popupFadeIn {
@@ -169,6 +370,22 @@
         
         .leaflet-popup-tip {
             background: #ffe8f0 !important;
+            filter: none !important;
+        }
+        
+        /* Ensure popup stays above blur overlay */
+        .leaflet-popup-pane {
+            z-index: 700 !important;
+        }
+        
+        .leaflet-popup {
+            z-index: 701 !important;
+        }
+        
+        /* Keep active marker crisp */
+        .custom-marker.marker-active {
+            filter: none !important;
+            z-index: 650 !important;
         }
         
         /* Header */
@@ -178,13 +395,12 @@
             left: 20px;
             z-index: 3;
             pointer-events: none;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 15px 25px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             animation: slideInLeft 0.8s ease-out;
         }
         
@@ -213,7 +429,7 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 14px 28px;
@@ -221,8 +437,7 @@
             font-size: 14px;
             font-weight: 600;
             color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             z-index: 3;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -276,23 +491,24 @@
         }
         
         .category-toggle {
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 25px;
-            padding: 12px 20px;
+            padding: 14px 22px;
             font-size: 14px;
-            font-weight: 600;
-            color: #fff;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.75);
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
             -webkit-tap-highlight-color: transparent;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             position: relative;
             overflow: hidden;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            font-style: italic;
+            letter-spacing: 0.3px;
         }
         
         .category-toggle::before {
@@ -318,18 +534,17 @@
         }
         
         .category-toggle.active {
-            background: linear-gradient(135deg, #ff69b4 0%, #ff85c1 50%, #ffa5d8 100%);
-            border-color: rgba(255, 255, 255, 0.5);
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.4) 0%, rgba(255, 133, 193, 0.35) 100%);
             color: #fff;
-            box-shadow: 0 6px 25px rgba(255, 105, 180, 0.5), 0 2px 10px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 6px 25px rgba(255, 105, 180, 0.4), 0 2px 10px rgba(0, 0, 0, 0.2);
             transform: translateX(-5px);
+            font-weight: 600;
         }
         
         .category-toggle.inactive {
-            opacity: 0.5;
-            background: rgba(200, 200, 200, 0.8);
-            border-color: #999;
-            color: #666;
+            opacity: 0.3;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.4);
         }
         
         /* Time of day toggles */
@@ -341,13 +556,12 @@
             z-index: 1000;
             display: flex;
             gap: 12px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             padding: 10px 15px;
             border-radius: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
             animation: slideInDown 0.8s ease-out;
         }
         
@@ -385,9 +599,8 @@
         .time-toggle.active {
             background: rgba(255, 255, 255, 0.25);
             color: #fff;
-            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .time-toggle.inactive {
@@ -563,6 +776,420 @@
                 transform: scale(1.05);
             }
         }
+        
+        /* ===================================== */
+        /* MOBILE RESPONSIVE (360x800 and below) */
+        /* ===================================== */
+        
+        @media (max-width: 480px) {
+            /* Header - smaller and repositioned */
+            #header {
+                top: 10px;
+                left: 10px;
+                padding: 10px 15px;
+                border-radius: 15px;
+            }
+            
+            #header h1 {
+                font-size: 20px;
+                letter-spacing: 0.5px;
+            }
+            
+            /* Time toggles - more compact */
+            #time-toggles {
+                top: 10px;
+                gap: 6px;
+                padding: 6px 10px;
+                border-radius: 20px;
+            }
+            
+            .time-toggle {
+                padding: 6px 12px;
+                font-size: 12px;
+                border-radius: 15px;
+            }
+            
+            /* Category toggles - smaller and adjusted */
+            #category-toggles {
+                top: 60px;
+                right: 10px;
+                gap: 8px;
+                max-width: 200px;
+            }
+            
+            .category-toggle {
+                padding: 10px 16px;
+                font-size: 12px;
+                border-radius: 20px;
+                letter-spacing: 0.2px;
+            }
+            
+            .category-toggle.active {
+                transform: translateX(-3px);
+            }
+            
+            /* Hint - smaller and repositioned */
+            #hint {
+                bottom: 15px;
+                padding: 10px 20px;
+                font-size: 12px;
+                border-radius: 20px;
+            }
+            
+            /* Markers - slightly smaller for mobile */
+            .custom-marker {
+                width: 28px;
+                height: 28px;
+                border: 2.5px solid #fff;
+            }
+            
+            .custom-marker::after {
+                width: 12px;
+                height: 12px;
+            }
+            
+            .custom-marker:hover {
+                transform: rotate(-45deg) scale(1.1);
+            }
+            
+            /* Popup - more compact */
+            .leaflet-popup-content-wrapper {
+                border-radius: 12px !important;
+            }
+            
+            .leaflet-popup-content {
+                margin: 12px !important;
+            }
+            
+            .leaflet-popup-content h3 {
+                font-size: 16px;
+                margin-bottom: 8px;
+            }
+            
+            .leaflet-popup-content p {
+                font-size: 12px;
+                line-height: 1.4;
+            }
+            
+            .leaflet-popup-content .description {
+                font-size: 12px;
+                padding: 6px;
+                margin: 8px 0;
+            }
+            
+            .leaflet-popup-content .quote {
+                font-size: 11px;
+                margin: 8px 0 4px 0;
+                padding-left: 8px;
+                border-left-width: 2px;
+            }
+            
+            /* Landing page - mobile optimized */
+            #landing-page .content {
+                padding: 20px;
+            }
+            
+            #landing-page h1 {
+                font-size: 36px;
+                margin-bottom: 15px;
+                letter-spacing: 2px;
+            }
+            
+            #landing-page .subtitle {
+                font-size: 18px;
+                margin-bottom: 30px;
+                letter-spacing: 1px;
+            }
+            
+            #landing-page .tap-hint {
+                font-size: 11px;
+                padding: 10px 25px;
+                border-width: 2px;
+                letter-spacing: 2px;
+            }
+            
+            /* Hearts and sparkles - fewer/smaller on mobile */
+            .heart {
+                font-size: 16px;
+            }
+            
+            .sparkle {
+                width: 3px;
+                height: 3px;
+            }
+            
+            /* Zoom controls - adjusted */
+            .leaflet-control-zoom {
+                margin-top: 60px !important;
+                margin-right: 10px !important;
+            }
+            
+            .leaflet-control-zoom a {
+                width: 26px !important;
+                height: 26px !important;
+                line-height: 26px !important;
+                font-size: 16px !important;
+            }
+            
+            /* Attribution - smaller */
+            .leaflet-control-attribution {
+                font-size: 8px !important;
+                padding: 1px 4px !important;
+            }
+        }
+        
+        /* Extra small screens (360px and below) */
+        @media (max-width: 360px) {
+            #header h1 {
+                font-size: 18px;
+            }
+            
+            .time-toggle {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+            
+            #category-toggles {
+                max-width: 180px;
+            }
+            
+            .category-toggle {
+                padding: 8px 14px;
+                font-size: 11px;
+            }
+            
+            #landing-page h1 {
+                font-size: 32px;
+            }
+            
+            #landing-page .subtitle {
+                font-size: 16px;
+            }
+        }
+        
+        /* ===================================== */
+        /* BOTTOM DOCK & CAROUSEL (MOBILE) */
+        /* ===================================== */
+        
+        /* Bottom dock container */
+        #bottom-dock {
+            display: block; /* Always visible for testing */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            padding: 15px 0 max(15px, env(safe-area-inset-bottom));
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4), 0 -2px 15px rgba(255, 105, 180, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Carousel container with horizontal scroll */
+        .dock-carousel {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 5px 20px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        
+        .dock-carousel::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+        
+        /* Individual dock pills */
+        .dock-pill {
+            flex-shrink: 0;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            -webkit-tap-highlight-color: transparent;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dock-pill:active {
+            transform: scale(0.96);
+        }
+        
+        /* Active/centered pill */
+        .dock-pill.active {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.5) 0%, rgba(255, 133, 193, 0.45) 100%);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(255, 105, 180, 0.5), 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 105, 180, 0.3);
+            border-color: rgba(255, 182, 193, 0.4);
+            font-weight: 700;
+        }
+        
+        .dock-pill.inactive {
+            opacity: 0.4;
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Sub-category panel */
+        .subcategory-panel {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: linear-gradient(180deg, rgba(20, 20, 30, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            padding: 20px 20px max(20px, env(safe-area-inset-bottom) + 80px);
+            border-radius: 25px 25px 0 0;
+            box-shadow: 0 -6px 40px rgba(0, 0, 0, 0.5), 0 -2px 20px rgba(255, 105, 180, 0.2);
+            transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 0;
+            border-top: 2px solid rgba(255, 182, 193, 0.3);
+        }
+        
+        .subcategory-panel.open {
+            bottom: 0;
+            opacity: 1;
+        }
+        
+        /* Sub-category header */
+        .subcategory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #subcategory-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(255, 105, 180, 0.4);
+        }
+        
+        .close-subcategory {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(10px);
+        }
+        
+        .close-subcategory:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Sub-category chips container */
+        .subcategory-chips {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 5px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .subcategory-chips::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Individual sub-category chip */
+        .subcategory-chip {
+            flex-shrink: 0;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(10px);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subcategory-chip:active {
+            transform: scale(0.95);
+        }
+        
+        .subcategory-chip.active {
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.4) 0%, rgba(255, 133, 193, 0.35) 100%);
+            color: #fff;
+            border-color: rgba(255, 182, 193, 0.5);
+            box-shadow: 0 3px 15px rgba(255, 105, 180, 0.4);
+            font-weight: 600;
+        }
+        
+        .subcategory-chip.inactive {
+            opacity: 0.3;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Backdrop overlay for sub-category panel */
+        .subcategory-panel::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        
+        .subcategory-panel.open::before {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Mobile-specific overrides */
+        @media (max-width: 768px) {
+            /* Hide desktop category toggles on mobile */
+            #category-toggles {
+                display: none !important;
+            }
+            
+            /* Adjust hint position to not overlap with dock */
+            #hint {
+                bottom: 100px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -596,22 +1223,54 @@
         <h1>Our NYC</h1>
     </div>
     
-    <!-- Category toggles -->
+    <!-- Category toggles (desktop) -->
     <div id="category-toggles">
         <div class="category-toggle active" data-category="nature" onclick="toggleCategory('nature')">
-            🌸 Blossoming Love
+            I want something soft
         </div>
         <div class="category-toggle active" data-category="views" onclick="toggleCategory('views')">
-            🌅 Golden Hour
+            I want something electric
         </div>
         <div class="category-toggle active" data-category="culture" onclick="toggleCategory('culture')">
-            🎨 Cultural Connection
+            I want something just for us
         </div>
         <div class="category-toggle active" data-category="adventure" onclick="toggleCategory('adventure')">
-            ✨ Adventure Together
+            I want to feel alive
         </div>
         <div class="category-toggle active" data-category="treats" onclick="toggleCategory('treats')">
-            🍰 Sweet Moments
+            I want to savor this
+        </div>
+    </div>
+    
+    <!-- Bottom Dock (mobile) -->
+    <div id="bottom-dock">
+        <div id="dock-carousel" class="dock-carousel">
+            <div class="dock-pill active" data-umbrella="Blossoming Love" onclick="handleDockPillClick('Blossoming Love')">
+                🌸 Blossoming Love
+            </div>
+            <div class="dock-pill active" data-umbrella="Golden Hour" onclick="handleDockPillClick('Golden Hour')">
+                ✨ Golden Hour
+            </div>
+            <div class="dock-pill active" data-umbrella="Sweet Moments" onclick="handleDockPillClick('Sweet Moments')">
+                🍰 Sweet Moments
+            </div>
+            <div class="dock-pill active" data-umbrella="Adventure Together" onclick="handleDockPillClick('Adventure Together')">
+                🗺️ Adventure Together
+            </div>
+            <div class="dock-pill active" data-umbrella="Just for Us" onclick="handleDockPillClick('Just for Us')">
+                💫 Just for Us
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sub-category Panel (mobile) -->
+    <div id="subcategory-panel" class="subcategory-panel">
+        <div class="subcategory-header">
+            <span id="subcategory-title"></span>
+            <button class="close-subcategory" onclick="closeSubcategoryPanel()">✕</button>
+        </div>
+        <div id="subcategory-chips" class="subcategory-chips">
+            <!-- Sub-category chips will be dynamically inserted here -->
         </div>
     </div>
     
@@ -702,7 +1361,9 @@
                 address: '1 FDR Four Freedoms Park, New York, NY 10044',
                 coords: [40.749864, -73.961200],
                 category: 'nature',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Blossoming Love',
+                subCategory: 'Parks & Gardens'
             },
             {
                 name: 'Picnic',
@@ -712,7 +1373,9 @@
                 coords: [40.771000, -73.974000],
                 category: 'nature',
                 description: 'A 15-acre lawn in Central Park where New Yorkers gather to sunbathe, picnic, and relax. Bring a blanket, some treats, and enjoy the city skyline surrounding this peaceful green oasis.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Blossoming Love',
+                subCategory: 'Parks & Gardens'
             },
             {
                 name: 'Sunset',
@@ -722,7 +1385,9 @@
                 coords: [40.784660, -73.981900],
                 category: 'views',
                 description: 'A hidden gem along the Hudson River with a marina, café, and stunning sunset views. Watch the sky turn pink and orange as boats bob in the water and the city lights begin to twinkle.',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Golden Hour',
+                subCategory: 'Waterfront Spots'
             },
             {
                 name: 'Outdoor Music',
@@ -732,7 +1397,9 @@
                 coords: [40.772667, -73.971333],
                 category: 'culture',
                 description: 'An iconic outdoor amphitheater hosting free concerts and performances throughout the warmer months. Sit on the grass and let live music fill the air as you enjoy a perfect NYC evening together.',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Hidden Spots' // Note: Could be considered a quiet outdoor space, similar to hidden spots
             },
             {
                 name: 'Get Lost in the West Village',
@@ -742,7 +1409,9 @@
                 coords: [40.730824, -73.997330],
                 category: 'adventure',
                 description: 'Start at the iconic arch and wander through charming cobblestone streets lined with brownstones, hidden gardens, and cozy cafés. The West Village is made for getting delightfully lost together.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Neighborhood Exploration'
             },
             {
                 name: 'Ferry Ride "to nowhere"',
@@ -752,7 +1421,9 @@
                 coords: [40.7013332, -74.0133104],
                 category: 'adventure',
                 description: 'The free Staten Island Ferry offers breathtaking views of the Statue of Liberty, Ellis Island, and the Manhattan skyline. It\'s a 25-minute journey each way—perfect for an unexpected mini-adventure.',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Ferries / Water'
             },
             {
                 name: 'Chelsea Galleries',
@@ -762,7 +1433,9 @@
                 coords: [40.7489324, -74.0044772],
                 category: 'culture',
                 description: 'Chelsea is home to hundreds of contemporary art galleries. Spend an afternoon hopping between exhibitions—from cutting-edge installations to thought-provoking photography. Most are free to enter.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Quiet Museums' // Note: Galleries as quiet museum-like spaces
             },
             {
                 name: 'Indie Film Night',
@@ -772,7 +1445,9 @@
                 coords: [40.7312056, -74.0016722],
                 category: 'culture',
                 description: 'A beloved indie cinema showing art-house films, foreign cinema, and documentaries. Grab tickets to something you\'ve never heard of and discover a new favorite film together.',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Hidden Spots' // Note: Intimate indie cinema experience
             },
             {
                 name: 'Coney Island Early Season',
@@ -782,7 +1457,9 @@
                 coords: [40.575245, -73.978577],
                 category: 'adventure',
                 description: 'NYC\'s iconic seaside amusement park with vintage rides, boardwalk games, and Nathan\'s Famous hot dogs. Visit early in the season for smaller crowds and that nostalgic carnival magic.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Day Trips'
             },
             {
                 name: 'Late-Night Dessert',
@@ -792,7 +1469,9 @@
                 coords: [40.7294715, -73.9844822],
                 category: 'treats',
                 description: 'A legendary Italian bakery serving classic pastries since 1894. Their cannoli, sfogliatelle, and tiramisu are perfect for satisfying late-night sweet cravings in the cozy, old-world atmosphere.',
-                timeOfDay: 'night'
+                timeOfDay: 'night',
+                umbrellaCategory: 'Sweet Moments',
+                subCategory: 'Dessert Spots'
             },
             {
                 name: 'Brooklyn Botanic Garden in Spring',
@@ -804,7 +1483,9 @@
                 description: 'A 52-acre botanical paradise with themed gardens including a famous cherry esplanade and Japanese garden. In spring, thousands of flowers bloom creating a breathtaking, romantic escape from the city.',
                 quote1: 'Flowers just beginning to open.',
                 quote2: 'I want to walk slowly with you while everything feels like it\'s waking up.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Blossoming Love',
+                subCategory: 'Parks & Gardens'
             },
             {
                 name: 'The Met Cloisters',
@@ -816,7 +1497,9 @@
                 description: 'A branch of the Met dedicated to medieval European art and architecture. Built from actual medieval cloisters, the museum overlooks the Hudson River and feels like a castle transported to NYC.',
                 quote1: 'Stone walls, river views, silence.',
                 quote2: 'It feels like stepping into another century together.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Quiet Museums'
             },
             {
                 name: 'Flea Market Day',
@@ -828,7 +1511,9 @@
                 description: 'A beloved weekend market with vintage finds, antiques, handmade goods, and food vendors. Browse through treasures and quirky discoveries while enjoying the vibrant Brooklyn atmosphere.',
                 quote1: 'Old objects, strange treasures.',
                 quote2: 'I like the idea of finding something meaningless that becomes ours.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Neighborhood Exploration'
             },
             {
                 name: 'Brooklyn Bridge at Sunrise',
@@ -840,7 +1525,9 @@
                 description: 'Walk across the iconic 1883 bridge as the sun rises over the East River. Early morning offers peace, golden light, and stunning views of Manhattan—a moment that feels entirely yours.',
                 quote1: 'Almost empty, soft light, quiet city.',
                 quote2: 'I want one morning that feels like it belongs only to us.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Golden Hour',
+                subCategory: 'Scenic Walks'
             },
             {
                 name: 'Shakespeare in the Park',
@@ -852,7 +1539,9 @@
                 description: 'Free outdoor performances of Shakespeare and other plays under the stars. Arrive early to get tickets, bring a blanket, and experience theater in one of NYC\'s most magical settings.',
                 quote1: 'Blankets, crowds, night air.',
                 quote2: 'I want to sit beside you while a story unfolds above us.',
-                timeOfDay: 'night'
+                timeOfDay: 'night',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Hidden Spots' // Note: Outdoor theater feels intimate despite crowds
             },
             {
                 name: 'Café-Hopping in SoHo',
@@ -864,7 +1553,9 @@
                 description: 'Explore SoHo\'s trendy streets lined with boutiques, cast-iron buildings, and cozy cafés. Make it a slow day—espresso here, pastry there, people-watching everywhere.',
                 quote1: 'One drink becomes another.',
                 quote2: 'I want a day where we linger and don\'t rush anything.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Sweet Moments',
+                subCategory: 'Cozy Cafés'
             },
             {
                 name: 'Museum of the City of New York',
@@ -876,7 +1567,9 @@
                 description: 'Discover the rich history of NYC through photographs, artifacts, and interactive exhibits. Learn about the city\'s evolution from Dutch colony to global metropolis—perfect for curious minds.',
                 quote1: 'Stories of how this place became what it is.',
                 quote2: 'I like learning a city with you instead of just walking through it.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Quiet Museums'
             },
             {
                 name: 'Kayaking on the Hudson',
@@ -888,7 +1581,9 @@
                 description: 'Free kayaking programs let you paddle along the Hudson with the Manhattan skyline as your backdrop. No experience needed—just adventure and a unique perspective of the city.',
                 quote1: 'Water close, skyline far.',
                 quote2: 'I want to see the city from somewhere unexpected with you.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Physical Activities'
             },
             {
                 name: 'Live Vinyl / Listening Bar Night',
@@ -900,7 +1595,9 @@
                 description: 'A legendary jazz club that\'s been hosting world-class musicians since 1935. Sit in the intimate basement venue and let the music transport you—no phones, just pure listening.',
                 quote1: 'Music you don\'t know yet.',
                 quote2: 'I want to discover new sounds while sitting close to you.',
-                timeOfDay: 'night'
+                timeOfDay: 'night',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Intimate Bars'
             },
             {
                 name: 'Photo Walk in DUMBO',
@@ -912,7 +1609,9 @@
                 description: 'Photogenic cobblestone streets with the Manhattan Bridge perfectly framed at every turn. Golden hour here is magical—capture the beauty or just soak it in together.',
                 quote1: 'Cobbled streets, bridges, light.',
                 quote2: 'I want a day that feels like we\'re inside a photograph.',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Golden Hour',
+                subCategory: 'Photography Locations'
             },
             {
                 name: 'Planetarium Show',
@@ -924,7 +1623,9 @@
                 description: 'Journey through the cosmos in this state-of-the-art planetarium. Watch stars, planets, and galaxies unfold above you in immersive shows that make the universe feel intimate and infinite.',
                 quote1: 'Dark room, moving stars.',
                 quote2: 'I want one moment where the world feels bigger and it\'s still just us.',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Quiet Museums'
             },
             {
                 name: 'Wine Bar Tucked Away',
@@ -936,7 +1637,9 @@
                 description: 'Find a quiet wine bar down a side street—candlelit, intimate, with a carefully curated wine list. The kind of place where conversation flows as smoothly as the wine.',
                 quote1: 'Low light, quiet conversations.',
                 quote2: 'I like nights that feel intimate without trying to be.',
-                timeOfDay: 'night'
+                timeOfDay: 'night',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Intimate Bars'
             },
             {
                 name: 'Arcade / Board Game Café',
@@ -948,7 +1651,9 @@
                 description: 'Classic arcade games meet craft beer in this nostalgic hangout. Challenge each other to Pac-Man, pinball, and retro games—let your competitive (and playful) sides shine.',
                 quote1: 'Playful, competitive, laughing too much.',
                 quote2: 'I want to see your serious face over something that doesn\'t matter.',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Neighborhood Exploration'
             },
             {
                 name: 'Beach Evening at Rockaway',
@@ -960,7 +1665,9 @@
                 description: 'NYC\'s best beach is just a train ride away. Watch the sunset over the Atlantic, feel the salt air, and remember that sometimes the city needs the ocean.',
                 quote1: 'Wind, ocean, nothing else.',
                 quote2: 'I want to sit beside you and listen to waves instead of the city.',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Golden Hour',
+                subCategory: 'Waterfront Spots'
             },
             {
                 name: 'Write Notes to Each Other in a Park',
@@ -971,9 +1678,222 @@
                 category: 'nature',
                 description: 'The tree-lined promenade in Central Park is perfect for a quiet afternoon. Bring paper and pens, find a bench, and write notes, thoughts, or letters to each other—words to save and remember.',
                 quote1: 'I want to leave you words you can keep.',
-                timeOfDay: 'day'
+                timeOfDay: 'day',
+                umbrellaCategory: 'Blossoming Love',
+                subCategory: 'Walks / Scenic Routes'
             }
         ];
+        
+        // Schema validation for umbrella and sub categories
+        const validCategoryPairs = {
+            'Blossoming Love': ['Parks & Gardens', 'Walks / Scenic Routes', 'Quiet Cafés', 'Viewpoints'],
+            'Golden Hour': ['Rooftops', 'Waterfront Spots', 'Scenic Walks', 'Photography Locations'],
+            'Sweet Moments': ['Dessert Spots', 'Cozy Cafés', 'Late-Night Food', 'Bookstores'],
+            'Adventure Together': ['Day Trips', 'Physical Activities', 'Neighborhood Exploration', 'Ferries / Water'],
+            'Just for Us': ['Hidden Spots', 'Quiet Museums', 'Intimate Bars', 'No-Plan Walks']
+        };
+        
+        // Validation function
+        function validateLocationSchema() {
+            const issues = [];
+            
+            locations.forEach((location, index) => {
+                // Check if umbrellaCategory exists
+                if (!location.umbrellaCategory) {
+                    issues.push(`Location ${index + 1} (${location.name}): Missing umbrellaCategory`);
+                } else if (location.umbrellaCategory === 'NEEDS_REVIEW') {
+                    issues.push(`Location ${index + 1} (${location.name}): umbrellaCategory needs review`);
+                }
+                
+                // Check if subCategory exists
+                if (!location.subCategory) {
+                    issues.push(`Location ${index + 1} (${location.name}): Missing subCategory`);
+                } else if (location.subCategory === 'NEEDS_REVIEW') {
+                    issues.push(`Location ${index + 1} (${location.name}): subCategory needs review`);
+                }
+                
+                // Check if the umbrella/subCategory pair is valid
+                if (location.umbrellaCategory && location.subCategory && 
+                    location.umbrellaCategory !== 'NEEDS_REVIEW' && 
+                    location.subCategory !== 'NEEDS_REVIEW') {
+                    const validSubs = validCategoryPairs[location.umbrellaCategory];
+                    if (!validSubs) {
+                        issues.push(`Location ${index + 1} (${location.name}): Invalid umbrellaCategory "${location.umbrellaCategory}"`);
+                    } else if (!validSubs.includes(location.subCategory)) {
+                        issues.push(`Location ${index + 1} (${location.name}): Invalid subCategory "${location.subCategory}" for umbrella "${location.umbrellaCategory}". Valid options: ${validSubs.join(', ')}`);
+                    }
+                }
+            });
+            
+            // Output validation results
+            if (issues.length > 0) {
+                console.warn('⚠️ Schema Validation Issues Found:');
+                issues.forEach(issue => console.warn('  - ' + issue));
+            } else {
+                console.log('✅ All locations have valid umbrella/subCategory pairings');
+            }
+            
+            return issues;
+        }
+        
+        // Run validation on load
+        validateLocationSchema();
+        
+        const subCategoryMap = {
+            'Blossoming Love': ['Parks & Gardens', 'Walks / Scenic Routes', 'Quiet Cafés', 'Viewpoints'],
+            'Golden Hour': ['Rooftops', 'Waterfront Spots', 'Scenic Walks', 'Photography Locations'],
+            'Sweet Moments': ['Dessert Spots', 'Cozy Cafés', 'Late-Night Food', 'Bookstores'],
+            'Adventure Together': ['Day Trips', 'Physical Activities', 'Neighborhood Exploration', 'Ferries / Water'],
+            'Just for Us': ['Hidden Spots', 'Quiet Museums', 'Intimate Bars', 'No-Plan Walks']
+        };
+        
+        let currentUmbrellaCategory = null;
+        let activeSubCategories = new Set();
+        let activeUmbrellaCategories = new Set(['Blossoming Love', 'Golden Hour', 'Sweet Moments', 'Adventure Together', 'Just for Us']);
+        
+        // Handle dock pill click
+        window.handleDockPillClick = function(umbrellaCategory) {
+            const pill = document.querySelector(`[data-umbrella="${umbrellaCategory}"]`);
+            const allPills = document.querySelectorAll('.dock-pill');
+            
+            // If clicking the already active pill, toggle sub-category panel
+            if (pill.classList.contains('active') && pill.classList.contains('centered')) {
+                const panel = document.getElementById('subcategory-panel');
+                if (panel.classList.contains('open')) {
+                    closeSubcategoryPanel();
+                } else {
+                    openSubcategoryPanel(umbrellaCategory);
+                }
+                return;
+            }
+            
+            // Deactivate all pills
+            allPills.forEach(p => {
+                p.classList.remove('active', 'centered');
+                p.classList.add('inactive');
+            });
+            
+            // Activate clicked pill
+            pill.classList.remove('inactive');
+            pill.classList.add('active', 'centered');
+            
+            // Scroll to center the pill perfectly
+            const carousel = document.getElementById('dock-carousel');
+            const pillOffsetLeft = pill.offsetLeft;
+            const pillWidth = pill.offsetWidth;
+            const carouselWidth = carousel.offsetWidth;
+            const scrollPosition = pillOffsetLeft - (carouselWidth / 2) + (pillWidth / 2);
+            carousel.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+            
+            // Update map based on umbrella category
+            currentUmbrellaCategory = umbrellaCategory;
+            activeSubCategories.clear();
+            
+            // Update active umbrella categories
+            activeUmbrellaCategories.clear();
+            activeUmbrellaCategories.add(umbrellaCategory);
+            
+            // Update desktop toggles to match (if visible)
+            const categoryToUmbrella = {
+                'Blossoming Love': 'nature',
+                'Golden Hour': 'views',
+                'Sweet Moments': 'treats',
+                'Adventure Together': 'adventure',
+                'Just for Us': 'culture'
+            };
+            const oldCategory = categoryToUmbrella[umbrellaCategory];
+            document.querySelectorAll('.category-toggle').forEach(toggle => {
+                const category = toggle.getAttribute('data-category');
+                if (category === oldCategory) {
+                    toggle.classList.add('active');
+                    toggle.classList.remove('inactive');
+                } else {
+                    toggle.classList.remove('active');
+                    toggle.classList.add('inactive');
+                }
+            });
+            
+            updateMarkerVisibility();
+            
+            // Auto-open subcategory panel immediately
+            openSubcategoryPanel(umbrellaCategory);
+        };
+        
+        // Open sub-category panel
+        function openSubcategoryPanel(umbrellaCategory) {
+            const panel = document.getElementById('subcategory-panel');
+            const title = document.getElementById('subcategory-title');
+            const chipsContainer = document.getElementById('subcategory-chips');
+            
+            // Set title
+            title.textContent = umbrellaCategory;
+            
+            // Clear existing chips
+            chipsContainer.innerHTML = '';
+            
+            // Get sub-categories for this umbrella
+            const subCategories = subCategoryMap[umbrellaCategory] || [];
+            
+            // Create chips for each sub-category
+            subCategories.forEach(subCat => {
+                const chip = document.createElement('div');
+                chip.className = 'subcategory-chip active';
+                chip.textContent = subCat;
+                chip.setAttribute('data-subcategory', subCat);
+                chip.onclick = () => toggleSubCategory(subCat, umbrellaCategory);
+                chipsContainer.appendChild(chip);
+                activeSubCategories.add(subCat);
+            });
+            
+            // Show panel
+            panel.classList.add('open');
+        }
+        
+        // Close sub-category panel
+        window.closeSubcategoryPanel = function() {
+            const panel = document.getElementById('subcategory-panel');
+            panel.classList.remove('open');
+            activeSubCategories.clear();
+            
+            // Reset to umbrella-level filtering (no subcategory filter)
+            updateMarkerVisibility();
+        };
+        
+        // Toggle sub-category
+        function toggleSubCategory(subCategory, umbrellaCategory) {
+            const chip = document.querySelector(`[data-subcategory="${subCategory}"]`);
+            
+            if (activeSubCategories.has(subCategory)) {
+                activeSubCategories.delete(subCategory);
+                chip.classList.remove('active');
+                chip.classList.add('inactive');
+            } else {
+                activeSubCategories.add(subCategory);
+                chip.classList.remove('inactive');
+                chip.classList.add('active');
+            }
+            
+            // Filter markers based on active sub-categories
+            updateMarkerVisibility();
+        }
+        
+        // Initialize bottom dock with all categories active
+        document.querySelectorAll('.dock-pill').forEach(pill => {
+            pill.classList.add('active');
+            pill.classList.remove('inactive');
+        });
+        
+        // Close sub-category panel when clicking backdrop
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('subcategory-panel');
+            const dock = document.getElementById('bottom-dock');
+            
+            if (panel.classList.contains('open') && 
+                !panel.contains(e.target) && 
+                !dock.contains(e.target)) {
+                closeSubcategoryPanel();
+            }
+        });
         
         // Create custom marker icon
         const customIcon = L.divIcon({
@@ -983,14 +1903,12 @@
             popupAnchor: [0, -30]
         });
         
-        // Store markers by category and time
-        const markersByCategory = {};
-        const markersByTime = {};
-        const activeCategories = new Set(['nature', 'views', 'culture', 'adventure', 'treats']);
+        // Store markers with their metadata for new filtering system
+        const allMarkers = [];
         const activeTimes = new Set(['day', 'night', 'both']);
         
         // Add markers to map
-        locations.forEach(location => {
+        locations.forEach((location, index) => {
             let popupContent = `
                 <h3>${location.name}</h3>
                 <p><strong>${location.fullName}</strong><br>
@@ -1017,37 +1935,98 @@
                 .addTo(map)
                 .bindPopup(popupContent);
             
-            // Store marker by category
-            if (!markersByCategory[location.category]) {
-                markersByCategory[location.category] = [];
-            }
-            markersByCategory[location.category].push(marker);
+            // Center map on marker click with vertical offset for popup
+            marker.on('click', function(e) {
+                // Calculate offset to center the popup vertically
+                const mapHeight = map.getSize().y;
+                const popupHeight = 250; // Approximate popup height
+                const offsetY = (mapHeight / 2 - popupHeight / 2) / mapHeight;
+                
+                // Get the point and apply offset
+                const targetPoint = map.project(e.latlng, map.getZoom()).subtract([0, mapHeight * offsetY * 0.3]);
+                const targetLatLng = map.unproject(targetPoint, map.getZoom());
+                
+                map.panTo(targetLatLng);
+            });
             
-            // Store marker by time of day
-            if (!markersByTime[location.timeOfDay]) {
-                markersByTime[location.timeOfDay] = [];
-            }
-            markersByTime[location.timeOfDay].push(marker);
+            // Add popup event listeners for focus effect
+            marker.on('popupopen', function(e) {
+                document.body.classList.add('popup-open');
+                document.getElementById('map').classList.add('popup-active');
+                // Mark this marker as active - getElement() returns the marker div itself
+                const markerElement = e.target.getElement();
+                if (markerElement) {
+                    markerElement.classList.add('marker-active');
+                }
+            });
+            
+            marker.on('popupclose', function(e) {
+                document.body.classList.remove('popup-open');
+                document.getElementById('map').classList.remove('popup-active');
+                // Remove active class from all markers
+                document.querySelectorAll('.custom-marker').forEach(m => {
+                    m.classList.remove('marker-active');
+                });
+            });
+            
+            // Store marker with metadata
+            allMarkers.push({
+                marker: marker,
+                umbrellaCategory: location.umbrellaCategory,
+                subCategory: location.subCategory,
+                timeOfDay: location.timeOfDay,
+                category: location.category // Keep for mood mapping
+            });
         });
         
-        // Toggle category function
+        // Calculate bounds from all location coordinates and set map limits
+        const allCoords = locations.map(loc => loc.coords);
+        if (allCoords.length > 0) {
+            // Create a bounds object from all coordinates
+            const bounds = L.latLngBounds(allCoords);
+            
+            // Add padding (in degrees) around the pins for a safe area
+            const padding = 0.02; // Adjust this value for more/less padding
+            const paddedBounds = bounds.pad(0.3); // 30% padding
+            
+            // Set max bounds to prevent scrolling beyond the padded area
+            map.setMaxBounds(paddedBounds);
+            
+            // Optional: Fit the map to show all pins initially
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+        
+        // Initialize atmosphere (default: all times active = anytime)
+        updateAtmosphere();
+        
+        // Initialize marker visibility
+        updateMarkerVisibility();
+        
+        // Toggle category function (for desktop toggles - now mapped to umbrella categories)
         window.toggleCategory = function(category) {
-            const toggle = document.querySelector(`[data-category="${category}"]`);
+            // Map old categories to umbrella categories
+            const categoryToUmbrella = {
+                'nature': 'Blossoming Love',
+                'views': 'Golden Hour',
+                'treats': 'Sweet Moments',
+                'adventure': 'Adventure Together',
+                'culture': 'Just for Us'
+            };
             
-            if (activeCategories.has(category)) {
-                // Deactivate
-                activeCategories.delete(category);
-                toggle.classList.remove('active');
-                toggle.classList.add('inactive');
-            } else {
-                // Activate
-                activeCategories.add(category);
-                toggle.classList.remove('inactive');
+            const umbrellaCategory = categoryToUmbrella[category];
+            if (umbrellaCategory) {
+                // Simulate clicking the corresponding dock pill
+                handleDockPillClick(umbrellaCategory);
+                
+                // Update the visual state of the desktop toggle
+                const toggle = document.querySelector(`[data-category="${category}"]`);
+                document.querySelectorAll('.category-toggle').forEach(t => {
+                    t.classList.remove('active');
+                    t.classList.add('inactive');
+                });
                 toggle.classList.add('active');
+                toggle.classList.remove('inactive');
             }
-            
-            // Update marker visibility based on active times and categories
-            updateMarkerVisibility();
         };
         
         // Toggle time of day function
@@ -1066,34 +2045,125 @@
                 toggle.classList.add('active');
             }
             
+            // Update atmospheric mode based on active time filters
+            updateAtmosphere();
+            
             // Update marker visibility based on active times and categories
             updateMarkerVisibility();
         };
         
-        // Update marker visibility based on both category and time filters
+        // Update atmospheric mode
+        function updateAtmosphere() {
+            const mapElement = document.getElementById('map');
+            const allMarkers = document.querySelectorAll('.custom-marker');
+            
+            // Remove all atmosphere classes
+            mapElement.classList.remove('atmosphere-day', 'atmosphere-night', 'atmosphere-anytime');
+            
+            // Remove all pin atmosphere classes
+            allMarkers.forEach(marker => {
+                marker.classList.remove('pin-day', 'pin-night', 'pin-anytime');
+            });
+            
+            // Determine dominant atmosphere based on active filters
+            let atmosphere = 'anytime'; // default
+            
+            if (activeTimes.size === 1) {
+                // Only one time active - use that atmosphere
+                if (activeTimes.has('day')) atmosphere = 'day';
+                else if (activeTimes.has('night')) atmosphere = 'night';
+                else if (activeTimes.has('both')) atmosphere = 'anytime';
+            } else if (activeTimes.size === 2) {
+                // Two times active
+                if (activeTimes.has('day') && activeTimes.has('night')) {
+                    atmosphere = 'anytime'; // blend of day and night
+                } else if (activeTimes.has('both')) {
+                    // 'both' plus either day or night
+                    atmosphere = activeTimes.has('day') ? 'day' : activeTimes.has('night') ? 'night' : 'anytime';
+                }
+            } else if (activeTimes.size === 3 || activeTimes.size === 0) {
+                // All active or none active - neutral
+                atmosphere = 'anytime';
+            }
+            
+            // Apply atmosphere to map
+            mapElement.classList.add(`atmosphere-${atmosphere}`);
+            
+            // Apply pin glow to all visible markers
+            allMarkers.forEach(marker => {
+                marker.classList.add(`pin-${atmosphere}`);
+            });
+        }
+        
+        // Update marker visibility based on umbrella categories, subcategories, and time filters
         function updateMarkerVisibility() {
-            locations.forEach((location, index) => {
-                const categoryActive = activeCategories.has(location.category);
-                const timeActive = activeTimes.has(location.timeOfDay);
-                const shouldShow = categoryActive && timeActive;
+            console.log('=== updateMarkerVisibility called ===');
+            console.log('Active umbrella categories:', Array.from(activeUmbrellaCategories));
+            console.log('Active subcategories:', Array.from(activeSubCategories));
+            console.log('Active times:', Array.from(activeTimes));
+            console.log('Total markers:', allMarkers.length);
+            
+            // Determine emotional mood based on umbrella category
+            let dominantMood = null;
+            if (activeUmbrellaCategories.size === 1) {
+                const umbrella = Array.from(activeUmbrellaCategories)[0];
+                if (umbrella === 'Blossoming Love') dominantMood = 'soft';
+                else if (umbrella === 'Golden Hour') dominantMood = 'electric';
+                else if (umbrella === 'Sweet Moments') dominantMood = 'soft';
+                else if (umbrella === 'Adventure Together') dominantMood = 'electric';
+                else if (umbrella === 'Just for Us') dominantMood = 'intimate';
+            }
+            
+            let shownCount = 0;
+            let hiddenCount = 0;
+            
+            // Update each marker
+            allMarkers.forEach(markerData => {
+                const marker = markerData.marker;
                 
-                // Get all markers for this location
-                const categoryMarkers = markersByCategory[location.category] || [];
-                const timeMarkers = markersByTime[location.timeOfDay] || [];
+                // Check if marker passes filters
+                const timeActive = activeTimes.has(markerData.timeOfDay);
+                const umbrellaActive = activeUmbrellaCategories.has(markerData.umbrellaCategory);
                 
-                // Find the marker that belongs to this location
-                categoryMarkers.forEach(marker => {
-                    if (timeMarkers.includes(marker)) {
-                        if (shouldShow) {
-                            if (!map.hasLayer(marker)) {
-                                marker.addTo(map);
-                            }
-                        } else {
-                            map.removeLayer(marker);
+                // Check subcategory filter (only if subcategories are active)
+                let subCategoryActive = true;
+                if (activeSubCategories.size > 0) {
+                    subCategoryActive = activeSubCategories.has(markerData.subCategory);
+                }
+                
+                const shouldShow = timeActive && umbrellaActive && subCategoryActive;
+                
+                console.log(`Marker: ${markerData.umbrellaCategory} / ${markerData.subCategory} - Show: ${shouldShow}`);
+                
+                if (shouldShow) {
+                    shownCount++;
+                    // Ensure marker is on map FIRST
+                    if (!map.hasLayer(marker)) {
+                        marker.addTo(map);
+                    }
+                    
+                    // Now we can safely access the element
+                    const markerElement = marker.getElement();
+                    if (markerElement) {
+                        // Remove all mood and fade classes
+                        markerElement.classList.remove('mood-soft', 'mood-electric', 'mood-intimate', 'faded');
+                        
+                        // Apply emotional mood
+                        if (dominantMood) {
+                            markerElement.classList.add(`mood-${dominantMood}`);
                         }
                     }
-                });
+                } else {
+                    hiddenCount++;
+                    // Hide marker by removing from map
+                    if (map.hasLayer(marker)) {
+                        map.removeLayer(marker);
+                    }
+                }
             });
+            
+            console.log(`Shown: ${shownCount}, Hidden: ${hiddenCount}`);
+            console.log('=== End updateMarkerVisibility ===');
         }
         
         // Auto-hide hint after 5 seconds
