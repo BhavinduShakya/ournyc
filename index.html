@@ -298,7 +298,7 @@
         
         .custom-marker {
             opacity: 1;
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .custom-marker::after {
@@ -311,6 +311,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+        }
+        
+        /* Completed marker styling */
+        .custom-marker.completed {
+            opacity: 0.5;
+            filter: grayscale(80%);
+        }
+        
+        .custom-marker.completed::after {
+            background: #fff;
         }
         
         /* Custom popup styling */
@@ -383,6 +393,31 @@
             line-height: 1.5;
         }
         
+        .activity-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 182, 193, 0.3);
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .activity-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #ff69b4;
+        }
+        
+        .activity-checkbox label {
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
         .leaflet-popup-tip {
             background: #ffe8f0 !important;
             filter: none !important;
@@ -413,7 +448,7 @@
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 15px 25px;
+            padding: 12px 20px;
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             animation: slideInLeft 0.8s ease-out;
@@ -579,6 +614,66 @@
             bottom: 246px;
         }
         
+        /* Progress tracker at top left */
+        #progress-tracker {
+            position: fixed;
+            top: 75px;
+            left: 20px;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: none;
+            border-radius: 16px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(0, 0, 0, 0.2);
+            min-width: 140px;
+        }
+        
+        #progress-tracker .tracker-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        #progress-tracker .tracker-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        #progress-tracker .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #fff;
+        }
+        
+        #progress-tracker .stat-label {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        #progress-tracker .stat-value {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        #progress-tracker .stat-row.completed .stat-label {
+            color: #4ade80;
+        }
+        
+        #progress-tracker .stat-row.available .stat-label {
+            color: #fbbf24;
+        }
+        
         .time-toggle {
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(20px);
@@ -708,7 +803,7 @@
         }
         
         #landing-page h1 {
-            font-size: 64px;
+            font-size: 30px;
             font-weight: 700;
             color: #fff;
             margin-bottom: 20px;
@@ -889,7 +984,7 @@
             }
             
             #landing-page h1 {
-                font-size: 36px;
+                font-size: 42px;
                 margin-bottom: 15px;
                 letter-spacing: 2px;
             }
@@ -958,7 +1053,7 @@
             }
             
             #landing-page h1 {
-                font-size: 32px;
+                font-size: 38px;
             }
             
             #landing-page .subtitle {
@@ -989,7 +1084,7 @@
         /* Carousel container with horizontal scroll */
         .dock-carousel {
             display: flex;
-            gap: 12px;
+            gap: 20px;
             overflow-x: auto;
             overflow-y: hidden;
             scroll-behavior: smooth;
@@ -1006,9 +1101,9 @@
         /* Individual dock pills */
         .dock-pill {
             flex-shrink: 0;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.7);
             background: rgba(255, 255, 255, 0.1);
@@ -1229,9 +1324,9 @@
     <!-- Landing page -->
     <div id="landing-page" onclick="hideLanding()">
         <div class="content">
-            <h1>Our New York</h1>
+            <h1>Our New York City</h1>
             <div class="subtitle">A Map of Possibility</div>
-            <div class="tap-hint">Tap to Begin</div>
+            <div class="tap-hint">Tap to Explore</div>
         </div>
     </div>
     
@@ -1240,7 +1335,7 @@
     
     <!-- Header -->
     <div id="header">
-        <h1>Our NYC</h1>
+        <h1>Our Little Moments</h1>
     </div>
     
     <!-- Category toggles (desktop) -->
@@ -1265,6 +1360,9 @@
     <!-- Bottom Dock (mobile) -->
     <div id="bottom-dock">
         <div id="dock-carousel" class="dock-carousel">
+            <div class="dock-pill active" data-umbrella="Everything All At Once" onclick="handleDockPillClick('Everything All At Once')">
+                🌟 Everything All At Once
+            </div>
             <div class="dock-pill active" data-umbrella="Blossoming Love" onclick="handleDockPillClick('Blossoming Love')">
                 🌸 Blossoming Love
             </div>
@@ -1294,6 +1392,21 @@
         </div>
     </div>
     
+    <!-- Progress Tracker -->
+    <div id="progress-tracker">
+        <div class="tracker-title">Activities</div>
+        <div class="tracker-stats">
+            <div class="stat-row completed">
+                <span class="stat-label">✓ Completed</span>
+                <span class="stat-value" id="completed-count">0</span>
+            </div>
+            <div class="stat-row available">
+                <span class="stat-label">◯ Available</span>
+                <span class="stat-value" id="available-count">0</span>
+            </div>
+        </div>
+    </div>
+    
     <!-- Time of day toggles -->
     <div id="time-toggles">
         <div class="time-toggle active" data-time="day" onclick="toggleTime('day')">
@@ -1311,7 +1424,7 @@
     
     <!-- Hint -->
     <div id="hint" onclick="this.classList.add('hidden')">
-        Drag to pan · Pinch to zoom
+        Please Drag to Pan and Pinch to Zoom My Darling
     </div>
     
     <!-- Leaflet JS -->
@@ -1368,7 +1481,7 @@
         const map = L.map('map', {
             center: [40.7580, -73.9855], // Times Square area
             zoom: 13,
-            zoomControl: true,
+            zoomControl: false,
             attributionControl: true,
             minZoom: 11,
             maxZoom: 18,
@@ -1812,6 +1925,65 @@
             const pill = document.querySelector(`[data-umbrella="${umbrellaCategory}"]`);
             const allPills = document.querySelectorAll('.dock-pill');
             
+            // Special handling for "Everything All At Once"
+            if (umbrellaCategory === 'Everything All At Once') {
+                // Deactivate all pills
+                allPills.forEach(p => {
+                    p.classList.remove('active', 'centered');
+                    p.classList.add('inactive');
+                });
+                
+                // Activate the Everything pill
+                pill.classList.remove('inactive');
+                pill.classList.add('active', 'centered');
+                
+                // Scroll to center the pill
+                const carousel = document.getElementById('dock-carousel');
+                const pillOffsetLeft = pill.offsetLeft;
+                const pillWidth = pill.offsetWidth;
+                const carouselWidth = carousel.offsetWidth;
+                const scrollPosition = pillOffsetLeft - (carouselWidth / 2) + (pillWidth / 2);
+                carousel.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                
+                // Show all umbrella categories
+                activeUmbrellaCategories.clear();
+                activeUmbrellaCategories.add('Blossoming Love');
+                activeUmbrellaCategories.add('Golden Hour');
+                activeUmbrellaCategories.add('Sweet Moments');
+                activeUmbrellaCategories.add('Adventure Together');
+                activeUmbrellaCategories.add('Just for Us');
+                
+                // Activate both day and night time filters
+                activeTimes.clear();
+                activeTimes.add('day');
+                activeTimes.add('night');
+                
+                // Update time toggle buttons to show as active
+                document.querySelectorAll('.time-toggle').forEach(toggle => {
+                    toggle.classList.add('active');
+                    toggle.classList.remove('inactive');
+                });
+                
+                // Clear subcategory filters
+                activeSubCategories.clear();
+                currentUmbrellaCategory = null;
+                
+                // Close subcategory panel
+                closeSubcategoryPanel();
+                
+                // Activate all desktop toggles
+                document.querySelectorAll('.category-toggle').forEach(toggle => {
+                    toggle.classList.add('active');
+                    toggle.classList.remove('inactive');
+                });
+                
+                // Update atmosphere
+                updateAtmosphere();
+                
+                updateMarkerVisibility();
+                return;
+            }
+            
             // If clicking the already active pill, toggle sub-category panel
             if (pill.classList.contains('active') && pill.classList.contains('centered')) {
                 const panel = document.getElementById('subcategory-panel');
@@ -1971,8 +2143,61 @@
         const allMarkers = [];
         const activeTimes = new Set(['day', 'night']);
         
+        // Load completed activities from localStorage
+        const completedActivities = JSON.parse(localStorage.getItem('completedActivities') || '{}');
+        
+        // Function to update progress tracker
+        window.updateProgressTracker = function() {
+            // Count total activities (exclude home locations - first 2 in array)
+            const totalActivities = locations.length - 2; // Subtract 2 home locations
+            
+            // Count completed activities
+            let completedCount = 0;
+            Object.keys(completedActivities).forEach(key => {
+                if (completedActivities[key] === true) {
+                    completedCount++;
+                }
+            });
+            
+            const availableCount = totalActivities - completedCount;
+            
+            // Update DOM
+            document.getElementById('completed-count').textContent = completedCount;
+            document.getElementById('available-count').textContent = availableCount;
+        };
+        
+        // Function to toggle activity completion
+        window.toggleActivityCompletion = function(locationIndex, isHome) {
+            if (isHome) return; // Don't allow completion for home locations
+            
+            const checkbox = document.getElementById(`activity-checkbox-${locationIndex}`);
+            const isCompleted = checkbox.checked;
+            
+            // Update localStorage
+            completedActivities[locationIndex] = isCompleted;
+            localStorage.setItem('completedActivities', JSON.stringify(completedActivities));
+            
+            // Update marker styling
+            const markerData = allMarkers[locationIndex];
+            const markerElement = markerData.marker.getElement();
+            
+            if (markerElement) {
+                if (isCompleted) {
+                    markerElement.classList.add('completed');
+                } else {
+                    markerElement.classList.remove('completed');
+                }
+            }
+            
+            // Update progress tracker
+            updateProgressTracker();
+        };
+        
         // Add markers to map
         locations.forEach((location, index) => {
+            const isHome = location.place === 'Bhavi Home' || location.place === 'Bel Home';
+            const isCompleted = completedActivities[index] || false;
+            
             let popupContent = `
                 <h3>${location.name}</h3>
                 <p><strong>${location.fullName}</strong><br>
@@ -1995,25 +2220,57 @@
                 `;
             }
             
+            // Add completion checkbox (not for home locations)
+            if (!isHome) {
+                popupContent += `
+                    <div class="activity-checkbox">
+                        <input type="checkbox" id="activity-checkbox-${index}" 
+                               onchange="toggleActivityCompletion(${index}, ${isHome})" 
+                               ${isCompleted ? 'checked' : ''}>
+                        <label for="activity-checkbox-${index}">Mark as completed</label>
+                    </div>
+                `;
+            }
+            
             // Use home icon for home locations, regular icon for others
             const icon = (location.place === 'Bhavi Home' || location.place === 'Bel Home') ? homeIcon : customIcon;
             
             const marker = L.marker(location.coords, { icon: icon })
                 .addTo(map)
-                .bindPopup(popupContent);
+                .bindPopup(popupContent, {
+                    autoClose: true,
+                    closeOnClick: false
+                });
             
-            // Center map on marker click with vertical offset for popup
+            // Center map on marker click with vertical offset for popup and ensure proper zoom
             marker.on('click', function(e) {
-                // Calculate offset to center the popup vertically
-                const mapHeight = map.getSize().y;
-                const popupHeight = 250; // Approximate popup height
-                const offsetY = (mapHeight / 2 - popupHeight / 2) / mapHeight;
+                // Prevent default popup opening
+                L.DomEvent.stopPropagation(e);
                 
-                // Get the point and apply offset
-                const targetPoint = map.project(e.latlng, map.getZoom()).subtract([0, mapHeight * offsetY * 0.3]);
-                const targetLatLng = map.unproject(targetPoint, map.getZoom());
+                // Close any open popups first
+                map.closePopup();
                 
-                map.panTo(targetLatLng);
+                // Ensure minimum zoom level for readability
+                const currentZoom = map.getZoom();
+                const minZoom = 15; // Minimum zoom level for clear visibility
+                const targetZoom = Math.max(currentZoom, minZoom);
+                
+                // Calculate offset to center both pin and popup
+                // We need to offset the view upward so popup appears above center
+                const px = map.project(e.latlng, targetZoom);
+                px.y -= 100; // Shift view down by 100px so pin+popup are centered
+                const offsetLatLng = map.unproject(px, targetZoom);
+                
+                // Smoothly zoom to the offset location
+                map.flyTo(offsetLatLng, targetZoom, {
+                    duration: 1.2,
+                    easeLinearity: 0.15
+                });
+                
+                // Open popup after zoom animation completes
+                setTimeout(function() {
+                    marker.openPopup();
+                }, 1200); // Match the duration of flyTo
             });
             
             // Add popup event listeners for focus effect
@@ -2024,6 +2281,14 @@
                 const markerElement = e.target.getElement();
                 if (markerElement) {
                     markerElement.classList.add('marker-active');
+                }
+                
+                // Update checkbox state to match current completion status
+                if (!isHome) {
+                    const checkbox = document.getElementById(`activity-checkbox-${index}`);
+                    if (checkbox) {
+                        checkbox.checked = completedActivities[index] || false;
+                    }
                 }
             });
             
@@ -2039,12 +2304,23 @@
             // Store marker with metadata
             allMarkers.push({
                 marker: marker,
+                index: index,
                 umbrellaCategory: location.umbrellaCategory,
                 subCategory: location.subCategory,
                 timeOfDay: location.timeOfDay,
                 category: location.category, // Keep for mood mapping
                 isHome: location.place === 'Bhavi Home' || location.place === 'Bel Home'
             });
+            
+            // Apply completed styling if activity was previously completed
+            if (isCompleted && !isHome) {
+                setTimeout(() => {
+                    const markerElement = marker.getElement();
+                    if (markerElement) {
+                        markerElement.classList.add('completed');
+                    }
+                }, 100);
+            }
         });
         
         // Calculate bounds from all location coordinates and set map limits
@@ -2074,6 +2350,9 @@
         
         // Initialize marker visibility
         updateMarkerVisibility();
+        
+        // Initialize progress tracker
+        updateProgressTracker();
         
         // Function to return to home locations
         window.goToHome = function() {
@@ -2244,6 +2523,13 @@
                     if (markerElement) {
                         // Remove all mood and fade classes
                         markerElement.classList.remove('mood-soft', 'mood-electric', 'mood-intimate', 'faded');
+                        
+                        // Reapply completed class if this activity was completed
+                        if (!markerData.isHome && completedActivities[markerData.index]) {
+                            markerElement.classList.add('completed');
+                        } else {
+                            markerElement.classList.remove('completed');
+                        }
                         
                         // Apply emotional mood
                         if (dominantMood) {
