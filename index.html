@@ -281,6 +281,21 @@
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
+        /* Blue marker - for home locations */
+        .custom-marker.blue-marker {
+            background: linear-gradient(135deg, #4A90E2 0%, #5BA3F5 100%);
+            border-color: rgba(91, 163, 245, 0.8);
+        }
+        
+        .custom-marker.blue-marker::after {
+            background: rgba(91, 163, 245, 0.95);
+        }
+        
+        .custom-marker.blue-marker:hover {
+            background: linear-gradient(135deg, #5BA3F5 0%, #6CB4FF 100%);
+            box-shadow: 0 8px 30px rgba(74, 144, 226, 0.6);
+        }
+        
         .custom-marker {
             opacity: 1;
             transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -547,49 +562,45 @@
             color: rgba(255, 255, 255, 0.4);
         }
         
-        /* Time of day toggles */
+        /* Time of day toggles - positioned above home button */
         #time-toggles {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
+            bottom: 171px;
+            right: 20px;
+            z-index: 1001;
             display: flex;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.12);
-            padding: 10px 15px;
-            border-radius: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            animation: slideInDown 0.8s ease-out;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        @keyframes slideInDown {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -30px);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
+        /* Adjust time toggles position when subcategory panel is open */
+        .subcategory-panel.open ~ #time-toggles {
+            bottom: 246px;
         }
         
         .time-toggle {
-            background: transparent;
-            border: none;
-            border-radius: 20px;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            font-size: 24px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             -webkit-tap-highlight-color: transparent;
-            position: relative;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .time-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4), 0 3px 15px rgba(0, 0, 0, 0.3);
         }
         
         .time-toggle:active {
@@ -598,16 +609,15 @@
         
         .time-toggle.active {
             background: rgba(255, 255, 255, 0.25);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
-            backdrop-filter: blur(10px);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 6px 30px rgba(255, 255, 255, 0.3), 0 3px 15px rgba(0, 0, 0, 0.3);
         }
         
         .time-toggle.inactive {
-            opacity: 0.4;
-            background: rgba(200, 200, 200, 0.7);
-            border-color: #999;
-            color: #666;
+            opacity: 0.3;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
         
         /* Landing page */
@@ -795,19 +805,8 @@
                 letter-spacing: 0.5px;
             }
             
-            /* Time toggles - more compact */
-            #time-toggles {
-                top: 10px;
-                gap: 6px;
-                padding: 6px 10px;
-                border-radius: 20px;
-            }
-            
-            .time-toggle {
-                padding: 6px 12px;
-                font-size: 12px;
-                border-radius: 15px;
-            }
+            /* Time toggles stay stacked above home button on mobile */
+            /* No mobile overrides needed - uses default positioning */
             
             /* Category toggles - smaller and adjusted */
             #category-toggles {
@@ -1054,7 +1053,7 @@
             background: linear-gradient(180deg, rgba(20, 20, 30, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
             backdrop-filter: blur(40px);
             -webkit-backdrop-filter: blur(40px);
-            padding: 20px 20px max(20px, env(safe-area-inset-bottom) + 80px);
+            padding: 25px 20px max(25px, env(safe-area-inset-bottom) + 80px);
             border-radius: 25px 25px 0 0;
             box-shadow: 0 -6px 40px rgba(0, 0, 0, 0.5), 0 -2px 20px rgba(255, 105, 180, 0.2);
             transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
@@ -1069,12 +1068,7 @@
         
         /* Sub-category header */
         .subcategory-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
         }
         
         #subcategory-title {
@@ -1178,6 +1172,45 @@
             pointer-events: auto;
         }
         
+        /* Home button - anchored to right side above dock */
+        #home-button {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #home-button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4), 0 3px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #home-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Adjust home button position when subcategory panel is open */
+        .subcategory-panel.open ~ #home-button {
+            bottom: 175px;
+        }
+
         /* Mobile-specific overrides */
         @media (max-width: 768px) {
             /* Hide desktop category toggles on mobile */
@@ -1204,19 +1237,6 @@
     
     <!-- Map container -->
     <div id="map"></div>
-    
-    <!-- Time of day toggles -->
-    <div id="time-toggles">
-        <div class="time-toggle active" data-time="day" onclick="toggleTime('day')">
-            ☀️ Day
-        </div>
-        <div class="time-toggle active" data-time="night" onclick="toggleTime('night')">
-            🌙 Night
-        </div>
-        <div class="time-toggle active" data-time="both" onclick="toggleTime('both')">
-            🌅 Anytime
-        </div>
-    </div>
     
     <!-- Header -->
     <div id="header">
@@ -1273,6 +1293,21 @@
             <!-- Sub-category chips will be dynamically inserted here -->
         </div>
     </div>
+    
+    <!-- Time of day toggles -->
+    <div id="time-toggles">
+        <div class="time-toggle active" data-time="day" onclick="toggleTime('day')">
+            ☀️
+        </div>
+        <div class="time-toggle active" data-time="night" onclick="toggleTime('night')">
+            🌙
+        </div>
+    </div>
+    
+    <!-- Home Button -->
+    <button id="home-button" onclick="goToHome()" title="Return to home locations">
+        🏠
+    </button>
     
     <!-- Hint -->
     <div id="hint" onclick="this.classList.add('hidden')">
@@ -1353,6 +1388,27 @@
         
         // Define all locations with addresses and categories
         const locations = [
+            {
+                name: 'Home',
+                place: 'Bhavi Home',
+                fullName: 'Bhavi Home',
+                address: 'Upper Manhattan, New York, NY',
+                coords: [40.806300283597146, -73.96018369164163],
+                description: 'When Bhavi is tired, he will rest here.',
+                quote1: 'When Bhavi is tired, he rests here.',
+                timeOfDay: 'both'
+            },
+            {
+                name: 'Home',
+                place: 'Bel Home',
+                fullName: 'Bel Home',
+                address: 'Astoria, Queens, NY',
+                coords: [40.778190600530586, -73.90912785830514],
+                description: 'Where every adventure begins and ends.',
+                quote1: 'Home is wherever we are together.',
+                quote2: 'This is where our story starts.',
+                timeOfDay: 'both'
+            },
             {
                 name: 'Cherry Blossoms',
                 place: 'Roosevelt Island',
@@ -1690,7 +1746,7 @@
             'Golden Hour': ['Rooftops', 'Waterfront Spots', 'Scenic Walks', 'Photography Locations'],
             'Sweet Moments': ['Dessert Spots', 'Cozy Cafés', 'Late-Night Food', 'Bookstores'],
             'Adventure Together': ['Day Trips', 'Physical Activities', 'Neighborhood Exploration', 'Ferries / Water'],
-            'Just for Us': ['Hidden Spots', 'Quiet Museums', 'Intimate Bars', 'No-Plan Walks']
+            'Just for Us': ['Hidden Spots', 'Quiet Museums', 'Intimate Bars', 'No-Plan Walks', 'Special Places']
         };
         
         // Validation function
@@ -1744,7 +1800,7 @@
             'Golden Hour': ['Rooftops', 'Waterfront Spots', 'Scenic Walks', 'Photography Locations'],
             'Sweet Moments': ['Dessert Spots', 'Cozy Cafés', 'Late-Night Food', 'Bookstores'],
             'Adventure Together': ['Day Trips', 'Physical Activities', 'Neighborhood Exploration', 'Ferries / Water'],
-            'Just for Us': ['Hidden Spots', 'Quiet Museums', 'Intimate Bars', 'No-Plan Walks']
+            'Just for Us': ['Hidden Spots', 'Quiet Museums', 'Intimate Bars', 'No-Plan Walks', 'Special Places']
         };
         
         let currentUmbrellaCategory = null;
@@ -1903,9 +1959,17 @@
             popupAnchor: [0, -30]
         });
         
+        // Create custom home icon (blue pin)
+        const homeIcon = L.divIcon({
+            className: 'custom-marker blue-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+        
         // Store markers with their metadata for new filtering system
         const allMarkers = [];
-        const activeTimes = new Set(['day', 'night', 'both']);
+        const activeTimes = new Set(['day', 'night']);
         
         // Add markers to map
         locations.forEach((location, index) => {
@@ -1931,7 +1995,10 @@
                 `;
             }
             
-            const marker = L.marker(location.coords, { icon: customIcon })
+            // Use home icon for home locations, regular icon for others
+            const icon = (location.place === 'Bhavi Home' || location.place === 'Bel Home') ? homeIcon : customIcon;
+            
+            const marker = L.marker(location.coords, { icon: icon })
                 .addTo(map)
                 .bindPopup(popupContent);
             
@@ -1975,7 +2042,8 @@
                 umbrellaCategory: location.umbrellaCategory,
                 subCategory: location.subCategory,
                 timeOfDay: location.timeOfDay,
-                category: location.category // Keep for mood mapping
+                category: location.category, // Keep for mood mapping
+                isHome: location.place === 'Bhavi Home' || location.place === 'Bel Home'
             });
         });
         
@@ -1992,8 +2060,13 @@
             // Set max bounds to prevent scrolling beyond the padded area
             map.setMaxBounds(paddedBounds);
             
-            // Optional: Fit the map to show all pins initially
-            map.fitBounds(bounds, { padding: [50, 50] });
+            // Focus on home locations initially
+            const homeCoords = [
+                [40.806300283597146, -73.96018369164163], // Bhavi Home
+                [40.778190600530586, -73.90912785830514]  // Bel Home
+            ];
+            const homeBounds = L.latLngBounds(homeCoords);
+            map.fitBounds(homeBounds, { padding: [100, 100] });
         }
         
         // Initialize atmosphere (default: all times active = anytime)
@@ -2001,6 +2074,16 @@
         
         // Initialize marker visibility
         updateMarkerVisibility();
+        
+        // Function to return to home locations
+        window.goToHome = function() {
+            const homeCoords = [
+                [40.806300283597146, -73.96018369164163], // Bhavi Home
+                [40.778190600530586, -73.90912785830514]  // Bel Home
+            ];
+            const homeBounds = L.latLngBounds(homeCoords);
+            map.fitBounds(homeBounds, { padding: [100, 100], animate: true, duration: 0.8 });
+        };
         
         // Toggle category function (for desktop toggles - now mapped to umbrella categories)
         window.toggleCategory = function(category) {
@@ -2121,8 +2204,22 @@
             allMarkers.forEach(markerData => {
                 const marker = markerData.marker;
                 
+                // Home markers are always visible
+                if (markerData.isHome) {
+                    if (!map.hasLayer(marker)) {
+                        marker.addTo(map);
+                    }
+                    const markerElement = marker.getElement();
+                    if (markerElement) {
+                        markerElement.classList.remove('faded');
+                    }
+                    return; // Skip filtering for home markers
+                }
+                
                 // Check if marker passes filters
-                const timeActive = activeTimes.has(markerData.timeOfDay);
+                // Show 'both' timeOfDay locations when both day and night are active
+                const timeActive = activeTimes.has(markerData.timeOfDay) || 
+                                   (markerData.timeOfDay === 'both' && activeTimes.has('day') && activeTimes.has('night'));
                 const umbrellaActive = activeUmbrellaCategories.has(markerData.umbrellaCategory);
                 
                 // Check subcategory filter (only if subcategories are active)
