@@ -165,6 +165,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             animation: markerPulse 2s ease-in-out infinite;
+            position: absolute !important;
         }
         
         @keyframes markerPulse {
@@ -288,12 +289,63 @@
         }
         
         .custom-marker.blue-marker::after {
-            background: rgba(91, 163, 245, 0.95);
+            background: #fff;
         }
         
         .custom-marker.blue-marker:hover {
             background: linear-gradient(135deg, #5BA3F5 0%, #6CB4FF 100%);
             box-shadow: 0 8px 30px rgba(74, 144, 226, 0.6);
+        }
+        
+        /* Red marker - for special activities */
+        .custom-marker.special-marker {
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            border-color: rgba(255, 0, 0, 1);
+        }
+        
+        .custom-marker.special-marker::after {
+            background: #fff;
+        }
+        
+        .custom-marker.special-marker:hover {
+            background: linear-gradient(135deg, #FF3333 0%, #FF0000 100%);
+            box-shadow: 0 8px 30px rgba(255, 0, 0, 0.8);
+        }
+        
+        /* Heart marker - for special location where we first met */
+        .custom-marker.heart-marker {
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            border-color: rgba(255, 0, 0, 1);
+            box-shadow: 0 8px 30px rgba(255, 0, 0, 0.8);
+            animation: pulse-red 2s ease-in-out infinite;
+        }
+        
+        .custom-marker.heart-marker::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .custom-marker.heart-marker:hover {
+            background: linear-gradient(135deg, #FF3333 0%, #FF0000 100%);
+            box-shadow: 0 10px 40px rgba(255, 0, 0, 1);
+        }
+        
+        @keyframes pulse-red {
+            0%, 100% { 
+                transform: rotate(-45deg) scale(0.85);
+                box-shadow: 0 8px 30px rgba(255, 0, 0, 0.8);
+            }
+            50% { 
+                transform: rotate(-45deg) scale(0.95);
+                box-shadow: 0 12px 40px rgba(255, 0, 0, 1);
+            }
         }
         
         .custom-marker {
@@ -1564,7 +1616,9 @@
                 address: 'Upper Manhattan, New York, NY',
                 coords: [40.806300283597146, -73.96018369164163],
                 description: 'When Bhavi is tired, he will rest here...rolling around like a big booritoo',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Special Places'
             },
             {
                 name: 'Home',
@@ -1573,7 +1627,21 @@
                 address: 'Astoria, Queens, NY',
                 coords: [40.778190600530586, -73.90912785830514],
                 description: 'This is where my princess goes to recharge like baby winnie the pooh?? hehhehe',
-                timeOfDay: 'both'
+                timeOfDay: 'both',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Special Places'
+            },
+            {
+                name: 'Where We First Met',
+                place: 'Untermyer Fountain',
+                fullName: 'Untermyer Fountain',
+                address: 'Upper Manhattan, New York, NY',
+                coords: [40.794318800816136, -73.95193157983725],
+                description: 'Ahhhh the Untermyer Fountain....it was a beautiful summer day on June 22nd where our story began... the place where two paths crossed and became one. Every journey starts with a single moment, and this was ours. ❤️',
+                timeOfDay: 'both',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Special Places',
+                isSpecial: true
             },
 
             // ═══════════════════════════════════════════════════════════════════════════
@@ -2236,6 +2304,22 @@
             popupAnchor: [0, -30]
         });
         
+        // Create custom special icon (red pin for special activities)
+        const specialIcon = L.divIcon({
+            className: 'custom-marker special-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+        
+        // Create custom heart icon (for special location)
+        const heartIcon = L.divIcon({
+            className: 'custom-marker heart-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+        
         // Store markers with their metadata for new filtering system
         const allMarkers = [];
         const activeTimes = new Set(['day', 'night']);
@@ -2311,6 +2395,7 @@
             }
             
             const isHome = location.place === 'Bhavi Home' || location.place === 'Bel Home';
+            const isSpecial = location.isSpecial === true;
             const isCompleted = completedActivities[index] || false;
             
             let popupContent = `
@@ -2335,8 +2420,8 @@
                 `;
             }
             
-            // Add completion checkbox (not for home locations)
-            if (!isHome) {
+            // Add completion checkbox (not for home or special locations)
+            if (!isHome && !isSpecial) {
                 popupContent += `
                     <div class="activity-checkbox">
                         <input type="checkbox" id="activity-checkbox-${index}" 
@@ -2347,8 +2432,13 @@
                 `;
             }
             
-            // Use home icon for home locations, regular icon for others
-            const icon = (location.place === 'Bhavi Home' || location.place === 'Bel Home') ? homeIcon : customIcon;
+            // Use appropriate icon based on location type
+            let icon = customIcon; // default
+            if (location.place === 'Bhavi Home' || location.place === 'Bel Home') {
+                icon = homeIcon;
+            } else if (location.isSpecial) {
+                icon = specialIcon;
+            }
             
             const marker = L.marker(location.coords, { icon: icon })
                 .addTo(map)
@@ -2424,11 +2514,12 @@
                 subCategory: location.subCategory,
                 timeOfDay: location.timeOfDay,
                 category: location.category, // Keep for mood mapping
-                isHome: location.place === 'Bhavi Home' || location.place === 'Bel Home'
+                isHome: location.place === 'Bhavi Home' || location.place === 'Bel Home',
+                isSpecial: location.isSpecial || false
             });
             
             // Apply completed styling if activity was previously completed
-            if (isCompleted && !isHome) {
+            if (isCompleted && !isHome && !isSpecial) {
                 setTimeout(() => {
                     const markerElement = marker.getElement();
                     if (markerElement) {
@@ -2598,8 +2689,8 @@
             allMarkers.forEach(markerData => {
                 const marker = markerData.marker;
                 
-                // Home markers are always visible
-                if (markerData.isHome) {
+                // Home and special markers are always visible
+                if (markerData.isHome || markerData.isSpecial) {
                     if (!map.hasLayer(marker)) {
                         marker.addTo(map);
                     }
@@ -2607,7 +2698,7 @@
                     if (markerElement) {
                         markerElement.classList.remove('faded');
                     }
-                    return; // Skip filtering for home markers
+                    return; // Skip filtering for home and special markers
                 }
                 
                 // Check if marker passes filters
