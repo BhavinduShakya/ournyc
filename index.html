@@ -438,20 +438,38 @@
             z-index: 650 !important;
         }
         
-        /* Header */
+        /* Fixed Top Bar - Clean Header with Progress */
         #header {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 3;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
             pointer-events: none;
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(20, 20, 20, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 12px 20px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            animation: slideInLeft 0.8s ease-out;
+            padding: 16px 24px;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideInTop 0.8s ease-out;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+        
+        @keyframes slideInTop {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         @keyframes slideInLeft {
@@ -466,11 +484,14 @@
         }
         
         #header h1 {
-            font-size: 32px;
+            font-size: 22px;
             font-weight: 700;
             color: #fff;
-            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.6), 0 4px 30px rgba(255, 105, 180, 0.3);
-            letter-spacing: 1px;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.6);
+            letter-spacing: 0.5px;
+            margin: 0;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         /* Hint */
@@ -494,6 +515,7 @@
             -webkit-tap-highlight-color: transparent;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             animation: slideInUp 0.8s ease-out;
+            text-align: center;
         }
         
         @keyframes slideInUp {
@@ -516,17 +538,9 @@
             pointer-events: none;
         }
         
-        /* Category toggles */
+        /* Category toggles - HIDDEN */
         #category-toggles {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 3;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 280px;
-            animation: slideInRight 0.8s ease-out;
+            display: none;
         }
         
         @keyframes slideInRight {
@@ -614,42 +628,42 @@
             bottom: 246px;
         }
         
-        /* Progress tracker at top left */
+        /* Progress tracker in top bar */
         #progress-tracker {
-            position: fixed;
-            top: 75px;
-            left: 20px;
-            z-index: 1001;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            position: relative;
+            top: 0;
+            left: 0;
+            z-index: auto;
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
             border: none;
-            border-radius: 16px;
-            padding: 12px 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(0, 0, 0, 0.2);
-            min-width: 140px;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+            min-width: auto;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-shrink: 0;
         }
         
         #progress-tracker .tracker-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            text-align: center;
+            display: none;
         }
         
         #progress-tracker .tracker-stats {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
+            flex-direction: row;
+            gap: 20px;
         }
         
         #progress-tracker .stat-row {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
+            gap: 8px;
             font-size: 13px;
             color: #fff;
         }
@@ -659,6 +673,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            opacity: 0.8;
         }
         
         #progress-tracker .stat-value {
@@ -887,17 +902,30 @@
         /* ===================================== */
         
         @media (max-width: 480px) {
-            /* Header - smaller and repositioned */
+            /* Top bar - stays single line */
             #header {
-                top: 10px;
-                left: 10px;
-                padding: 10px 15px;
-                border-radius: 15px;
+                padding: 12px 16px;
+                flex-direction: row;
+                gap: 12px;
+                align-items: center;
             }
             
             #header h1 {
-                font-size: 20px;
-                letter-spacing: 0.5px;
+                font-size: 16px;
+                letter-spacing: 0.3px;
+            }
+            
+            #progress-tracker {
+                gap: 12px;
+            }
+            
+            #progress-tracker .stat-row {
+                font-size: 11px;
+                gap: 4px;
+            }
+            
+            #progress-tracker .stat-value {
+                font-size: 13px;
             }
             
             /* Time toggles stay stacked above home button on mobile */
@@ -1325,7 +1353,7 @@
     <div id="landing-page" onclick="hideLanding()">
         <div class="content">
             <h1>Our New York City</h1>
-            <div class="subtitle">A Map of Possibility</div>
+            <div class="subtitle">A Map of Beautiful Possibility</div>
             <div class="tap-hint">Tap to Explore</div>
         </div>
     </div>
@@ -1333,27 +1361,20 @@
     <!-- Map container -->
     <div id="map"></div>
     
-    <!-- Header -->
+    <!-- Fixed Top Bar with Title and Progress -->
     <div id="header">
-        <h1>Our Little Moments</h1>
-    </div>
-    
-    <!-- Category toggles (desktop) -->
-    <div id="category-toggles">
-        <div class="category-toggle active" data-category="nature" onclick="toggleCategory('nature')">
-            I want something soft
-        </div>
-        <div class="category-toggle active" data-category="views" onclick="toggleCategory('views')">
-            I want something electric
-        </div>
-        <div class="category-toggle active" data-category="culture" onclick="toggleCategory('culture')">
-            I want something just for us
-        </div>
-        <div class="category-toggle active" data-category="adventure" onclick="toggleCategory('adventure')">
-            I want to feel alive
-        </div>
-        <div class="category-toggle active" data-category="treats" onclick="toggleCategory('treats')">
-            I want to savor this
+        <h1>Our NYC</h1>
+        <div id="progress-tracker">
+            <div class="tracker-stats">
+                <div class="stat-row completed">
+                    <span class="stat-label">✓ Completed</span>
+                    <span class="stat-value" id="completed-count">0</span>
+                </div>
+                <div class="stat-row available">
+                    <span class="stat-label">◯ Available</span>
+                    <span class="stat-value" id="available-count">0</span>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -1389,21 +1410,6 @@
         </div>
         <div id="subcategory-chips" class="subcategory-chips">
             <!-- Sub-category chips will be dynamically inserted here -->
-        </div>
-    </div>
-    
-    <!-- Progress Tracker -->
-    <div id="progress-tracker">
-        <div class="tracker-title">Activities</div>
-        <div class="tracker-stats">
-            <div class="stat-row completed">
-                <span class="stat-label">✓ Completed</span>
-                <span class="stat-value" id="completed-count">0</span>
-            </div>
-            <div class="stat-row available">
-                <span class="stat-label">◯ Available</span>
-                <span class="stat-value" id="available-count">0</span>
-            </div>
         </div>
     </div>
     
@@ -1500,15 +1506,64 @@
         }).addTo(map);
         
         // Define all locations with addresses and categories
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 📍 MAP PINS - ADD OR REMOVE LOCATIONS HERE
+        // ═══════════════════════════════════════════════════════════════════════════════
+        //
+        // HOW TO ADD A NEW PIN:
+        // 1. Copy the template below
+        // 2. Fill in all required fields (marked with *)
+        // 3. Paste it into the locations array below
+        // 4. Save the file - your pin will appear automatically!
+        //
+        // HOW TO REMOVE A PIN:
+        // Simply delete the entire pin object from the array below
+        //
+        // ───────────────────────────────────────────────────────────────────────────────
+        // PIN TEMPLATE (Copy this):
+        // ───────────────────────────────────────────────────────────────────────────────
+        /*
+        {
+            name: 'Short Name*',              // Required: Short display name
+            place: 'Location Name*',          // Required: Main location name
+            fullName: 'Full Official Name*',  // Required: Full location name
+            address: 'Full Address*',         // Required: Street address
+            coords: [latitude, longitude],    // Required: [40.7128, -74.0060]
+            description: 'Your description',  // Optional: Main description text
+            quote1: 'First quote',            // Optional: First quote
+            quote2: 'Second quote',           // Optional: Second quote
+            timeOfDay: 'day',                 // Required: 'day', 'night', or 'both'
+            umbrellaCategory: 'Category*',    // Required: See category list below
+            subCategory: 'Subcategory*',      // Required: Must match umbrella category
+            hidden: true                      // Optional: Set to true to hide this pin
+        },
+        */
+        //
+        // 🔒 TO HIDE A PIN: Add "hidden: true" to any pin object below
+        // 👁️ TO SHOW A PIN: Remove the "hidden: true" line or set it to false
+        //
+        // ───────────────────────────────────────────────────────────────────────────────
+        // VALID CATEGORY COMBINATIONS:
+        // ───────────────────────────────────────────────────────────────────────────────
+        // 'Blossoming Love' → 'Parks & Gardens', 'Walks / Scenic Routes', 'Quiet Cafés', 'Viewpoints'
+        // 'Golden Hour' → 'Rooftops', 'Waterfront Spots', 'Scenic Walks', 'Photography Locations'
+        // 'Sweet Moments' → 'Dessert Spots', 'Cozy Cafés', 'Late-Night Food', 'Bookstores'
+        // 'Adventure Together' → 'Day Trips', 'Physical Activities', 'Neighborhood Exploration', 'Ferries / Water'
+        // 'Just for Us' → 'Hidden Spots', 'Quiet Museums', 'Intimate Bars', 'No-Plan Walks', 'Special Places'
+        //
+        // ═══════════════════════════════════════════════════════════════════════════════
+
         const locations = [
+            // ═══════════════════════════════════════════════════════════════════════════
+            // HOME LOCATIONS (Always Visible)
+            // ═══════════════════════════════════════════════════════════════════════════
             {
                 name: 'Home',
                 place: 'Bhavi Home',
                 fullName: 'Bhavi Home',
                 address: 'Upper Manhattan, New York, NY',
                 coords: [40.806300283597146, -73.96018369164163],
-                description: 'When Bhavi is tired, he will rest here.',
-                quote1: 'When Bhavi is tired, he rests here.',
+                description: 'When Bhavi is tired, he will rest here...rolling around like a big booritoo',
                 timeOfDay: 'both'
             },
             {
@@ -1517,22 +1572,25 @@
                 fullName: 'Bel Home',
                 address: 'Astoria, Queens, NY',
                 coords: [40.778190600530586, -73.90912785830514],
-                description: 'Where every adventure begins and ends.',
-                quote1: 'Home is wherever we are together.',
-                quote2: 'This is where our story starts.',
+                description: 'This is where my princess goes to recharge like baby winnie the pooh?? hehhehe',
                 timeOfDay: 'both'
             },
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // BLOSSOMING LOVE - Parks, Nature & Romantic Spots
+            // ═══════════════════════════════════════════════════════════════════════════
             {
                 name: 'Cherry Blossoms',
                 place: 'Roosevelt Island',
-                description: 'I want to see the first signs of spring with you.',
+                description: 'I hear that Roosevelt Island has some of the most beautiful cherry blossoms. How about we go and see the first signs of spring together?',
                 fullName: 'Franklin D. Roosevelt Four Freedoms Park',
                 address: '1 FDR Four Freedoms Park, New York, NY 10044',
                 coords: [40.749864, -73.961200],
                 category: 'nature',
                 timeOfDay: 'day',
                 umbrellaCategory: 'Blossoming Love',
-                subCategory: 'Parks & Gardens'
+                subCategory: 'Parks & Gardens',
+                hidden: false  // Remove this line to show the pin on the map
             },
             {
                 name: 'Picnic',
@@ -1541,11 +1599,42 @@
                 address: 'Sheep Meadow, Central Park, New York, NY 10019',
                 coords: [40.771000, -73.974000],
                 category: 'nature',
-                description: 'A 15-acre lawn in Central Park where New Yorkers gather to sunbathe, picnic, and relax. Bring a blanket, some treats, and enjoy the city skyline surrounding this peaceful green oasis.',
+                description: 'Can we sit together under the sun (or shade hehehe) in Central Park? Not too much walking I promiseee!! We might need a blanket and some snacks for a relaxing afternoon surrounded by greenery and city views.',
                 timeOfDay: 'day',
                 umbrellaCategory: 'Blossoming Love',
-                subCategory: 'Parks & Gardens'
+                subCategory: 'Parks & Gardens',
+                hidden: false  // Remove this line to show the pin on the map
             },
+            {
+                name: 'Brooklyn Botanic Garden in Spring',
+                place: 'Brooklyn',
+                fullName: 'Brooklyn Botanic Garden',
+                address: '990 Washington Ave, Brooklyn, NY 11225',
+                coords: [40.668, -73.964],
+                category: 'nature',
+                description: 'Can we go an see the beautiful gardens including a famous cherry esplanade and Japanese garden. In spring, thousands of flowers bloom creating a breathtaking, romantic escape from the city. What do you say?',
+                timeOfDay: 'day',
+                umbrellaCategory: 'Blossoming Love',
+                subCategory: 'Parks & Gardens',
+                hidden: false  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Write Notes to Each Other in a Park',
+                place: 'Central Park',
+                fullName: 'The Mall (Central Park)',
+                address: 'The Mall, Central Park, New York, NY 10022',
+                coords: [40.771, -73.972],
+                category: 'nature',
+                description: 'How about a tree-lined promenade in Central Park is perfect for a quiet afternoon? We can bring paper and pens, find a bench, and write notes, thoughts, or letters to each other—words to save and remember.',
+                timeOfDay: 'day',
+                umbrellaCategory: 'Blossoming Love',
+                subCategory: 'Walks / Scenic Routes',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // GOLDEN HOUR - Sunsets, Views & Photography
+            // ═══════════════════════════════════════════════════════════════════════════
             {
                 name: 'Sunset',
                 place: 'Hudson River',
@@ -1556,133 +1645,8 @@
                 description: 'A hidden gem along the Hudson River with a marina, café, and stunning sunset views. Watch the sky turn pink and orange as boats bob in the water and the city lights begin to twinkle.',
                 timeOfDay: 'both',
                 umbrellaCategory: 'Golden Hour',
-                subCategory: 'Waterfront Spots'
-            },
-            {
-                name: 'Outdoor Music',
-                place: 'Central Park',
-                fullName: 'Naumburg Bandshell',
-                address: 'Naumburg Bandshell, Central Park, New York, NY 10021',
-                coords: [40.772667, -73.971333],
-                category: 'culture',
-                description: 'An iconic outdoor amphitheater hosting free concerts and performances throughout the warmer months. Sit on the grass and let live music fill the air as you enjoy a perfect NYC evening together.',
-                timeOfDay: 'both',
-                umbrellaCategory: 'Just for Us',
-                subCategory: 'Hidden Spots' // Note: Could be considered a quiet outdoor space, similar to hidden spots
-            },
-            {
-                name: 'Get Lost in the West Village',
-                place: 'West Village',
-                fullName: 'Washington Square Park',
-                address: 'Washington Square, New York, NY 10012',
-                coords: [40.730824, -73.997330],
-                category: 'adventure',
-                description: 'Start at the iconic arch and wander through charming cobblestone streets lined with brownstones, hidden gardens, and cozy cafés. The West Village is made for getting delightfully lost together.',
-                timeOfDay: 'day',
-                umbrellaCategory: 'Adventure Together',
-                subCategory: 'Neighborhood Exploration'
-            },
-            {
-                name: 'Ferry Ride "to nowhere"',
-                place: 'Manhattan',
-                fullName: 'Staten Island Ferry / Whitehall Terminal',
-                address: '4 Whitehall St, New York, NY 10004',
-                coords: [40.7013332, -74.0133104],
-                category: 'adventure',
-                description: 'The free Staten Island Ferry offers breathtaking views of the Statue of Liberty, Ellis Island, and the Manhattan skyline. It\'s a 25-minute journey each way—perfect for an unexpected mini-adventure.',
-                timeOfDay: 'both',
-                umbrellaCategory: 'Adventure Together',
-                subCategory: 'Ferries / Water'
-            },
-            {
-                name: 'Chelsea Galleries',
-                place: 'Chelsea',
-                fullName: 'Gladstone Gallery',
-                address: '530 W 21st St, New York, NY 10011',
-                coords: [40.7489324, -74.0044772],
-                category: 'culture',
-                description: 'Chelsea is home to hundreds of contemporary art galleries. Spend an afternoon hopping between exhibitions—from cutting-edge installations to thought-provoking photography. Most are free to enter.',
-                timeOfDay: 'day',
-                umbrellaCategory: 'Just for Us',
-                subCategory: 'Quiet Museums' // Note: Galleries as quiet museum-like spaces
-            },
-            {
-                name: 'Indie Film Night',
-                place: 'Greenwich Village',
-                fullName: 'IFC Center',
-                address: '323 6th Ave, New York, NY 10014',
-                coords: [40.7312056, -74.0016722],
-                category: 'culture',
-                description: 'A beloved indie cinema showing art-house films, foreign cinema, and documentaries. Grab tickets to something you\'ve never heard of and discover a new favorite film together.',
-                timeOfDay: 'both',
-                umbrellaCategory: 'Just for Us',
-                subCategory: 'Hidden Spots' // Note: Intimate indie cinema experience
-            },
-            {
-                name: 'Coney Island Early Season',
-                place: 'Coney Island',
-                fullName: 'Luna Park',
-                address: '1000 Surf Ave, Brooklyn, NY 11224',
-                coords: [40.575245, -73.978577],
-                category: 'adventure',
-                description: 'NYC\'s iconic seaside amusement park with vintage rides, boardwalk games, and Nathan\'s Famous hot dogs. Visit early in the season for smaller crowds and that nostalgic carnival magic.',
-                timeOfDay: 'day',
-                umbrellaCategory: 'Adventure Together',
-                subCategory: 'Day Trips'
-            },
-            {
-                name: 'Late-Night Dessert',
-                place: 'East Village',
-                fullName: "Veniero's Pasticceria & Caffé",
-                address: '342 E 11th St, New York, NY 10003',
-                coords: [40.7294715, -73.9844822],
-                category: 'treats',
-                description: 'A legendary Italian bakery serving classic pastries since 1894. Their cannoli, sfogliatelle, and tiramisu are perfect for satisfying late-night sweet cravings in the cozy, old-world atmosphere.',
-                timeOfDay: 'night',
-                umbrellaCategory: 'Sweet Moments',
-                subCategory: 'Dessert Spots'
-            },
-            {
-                name: 'Brooklyn Botanic Garden in Spring',
-                place: 'Brooklyn',
-                fullName: 'Brooklyn Botanic Garden',
-                address: '990 Washington Ave, Brooklyn, NY 11225',
-                coords: [40.668, -73.964],
-                category: 'nature',
-                description: 'A 52-acre botanical paradise with themed gardens including a famous cherry esplanade and Japanese garden. In spring, thousands of flowers bloom creating a breathtaking, romantic escape from the city.',
-                quote1: 'Flowers just beginning to open.',
-                quote2: 'I want to walk slowly with you while everything feels like it\'s waking up.',
-                timeOfDay: 'day',
-                umbrellaCategory: 'Blossoming Love',
-                subCategory: 'Parks & Gardens'
-            },
-            {
-                name: 'The Met Cloisters',
-                place: 'Fort Tryon Park',
-                fullName: 'The Met Cloisters',
-                address: '99 Margaret Corbin Dr, New York, NY 10040',
-                coords: [40.865, -73.932],
-                category: 'culture',
-                description: 'A branch of the Met dedicated to medieval European art and architecture. Built from actual medieval cloisters, the museum overlooks the Hudson River and feels like a castle transported to NYC.',
-                quote1: 'Stone walls, river views, silence.',
-                quote2: 'It feels like stepping into another century together.',
-                timeOfDay: 'day',
-                umbrellaCategory: 'Just for Us',
-                subCategory: 'Quiet Museums'
-            },
-            {
-                name: 'Flea Market Day',
-                place: 'Brooklyn',
-                fullName: 'Brooklyn Flea (Dumbo)',
-                address: '90 Kent Ave, Brooklyn, NY 11249',
-                coords: [40.706, -73.963],
-                category: 'adventure',
-                description: 'A beloved weekend market with vintage finds, antiques, handmade goods, and food vendors. Browse through treasures and quirky discoveries while enjoying the vibrant Brooklyn atmosphere.',
-                quote1: 'Old objects, strange treasures.',
-                quote2: 'I like the idea of finding something meaningless that becomes ours.',
-                timeOfDay: 'day',
-                umbrellaCategory: 'Adventure Together',
-                subCategory: 'Neighborhood Exploration'
+                subCategory: 'Waterfront Spots',
+                hidden: true  // Remove this line to show the pin on the map
             },
             {
                 name: 'Brooklyn Bridge at Sunrise',
@@ -1696,77 +1660,8 @@
                 quote2: 'I want one morning that feels like it belongs only to us.',
                 timeOfDay: 'day',
                 umbrellaCategory: 'Golden Hour',
-                subCategory: 'Scenic Walks'
-            },
-            {
-                name: 'Shakespeare in the Park',
-                place: 'Central Park',
-                fullName: 'Delacorte Theater',
-                address: 'Delacorte Theater, Central Park, New York, NY 10024',
-                coords: [40.779, -73.966],
-                category: 'culture',
-                description: 'Free outdoor performances of Shakespeare and other plays under the stars. Arrive early to get tickets, bring a blanket, and experience theater in one of NYC\'s most magical settings.',
-                quote1: 'Blankets, crowds, night air.',
-                quote2: 'I want to sit beside you while a story unfolds above us.',
-                timeOfDay: 'night',
-                umbrellaCategory: 'Just for Us',
-                subCategory: 'Hidden Spots' // Note: Outdoor theater feels intimate despite crowds
-            },
-            {
-                name: 'Café-Hopping in SoHo',
-                place: 'SoHo',
-                fullName: 'SoHo Neighborhood',
-                address: 'SoHo, New York, NY 10012',
-                coords: [40.723, -74.000],
-                category: 'treats',
-                description: 'Explore SoHo\'s trendy streets lined with boutiques, cast-iron buildings, and cozy cafés. Make it a slow day—espresso here, pastry there, people-watching everywhere.',
-                quote1: 'One drink becomes another.',
-                quote2: 'I want a day where we linger and don\'t rush anything.',
-                timeOfDay: 'day',
-                umbrellaCategory: 'Sweet Moments',
-                subCategory: 'Cozy Cafés'
-            },
-            {
-                name: 'Museum of the City of New York',
-                place: 'Upper East Side',
-                fullName: 'Museum of the City of New York',
-                address: '1220 5th Ave, New York, NY 10029',
-                coords: [40.792, -73.952],
-                category: 'culture',
-                description: 'Discover the rich history of NYC through photographs, artifacts, and interactive exhibits. Learn about the city\'s evolution from Dutch colony to global metropolis—perfect for curious minds.',
-                quote1: 'Stories of how this place became what it is.',
-                quote2: 'I like learning a city with you instead of just walking through it.',
-                timeOfDay: 'day',
-                umbrellaCategory: 'Just for Us',
-                subCategory: 'Quiet Museums'
-            },
-            {
-                name: 'Kayaking on the Hudson',
-                place: 'Hudson River Park',
-                fullName: 'Hudson River Park (Pier 26)',
-                address: 'Pier 26, Hudson River Park, New York, NY 10013',
-                coords: [40.718, -74.014],
-                category: 'adventure',
-                description: 'Free kayaking programs let you paddle along the Hudson with the Manhattan skyline as your backdrop. No experience needed—just adventure and a unique perspective of the city.',
-                quote1: 'Water close, skyline far.',
-                quote2: 'I want to see the city from somewhere unexpected with you.',
-                timeOfDay: 'day',
-                umbrellaCategory: 'Adventure Together',
-                subCategory: 'Physical Activities'
-            },
-            {
-                name: 'Live Vinyl / Listening Bar Night',
-                place: 'Greenwich Village',
-                fullName: 'Village Vanguard',
-                address: '178 7th Ave S, New York, NY 10014',
-                coords: [40.738, -74.002],
-                category: 'culture',
-                description: 'A legendary jazz club that\'s been hosting world-class musicians since 1935. Sit in the intimate basement venue and let the music transport you—no phones, just pure listening.',
-                quote1: 'Music you don\'t know yet.',
-                quote2: 'I want to discover new sounds while sitting close to you.',
-                timeOfDay: 'night',
-                umbrellaCategory: 'Just for Us',
-                subCategory: 'Intimate Bars'
+                subCategory: 'Scenic Walks',
+                hidden: true  // Remove this line to show the pin on the map
             },
             {
                 name: 'Photo Walk in DUMBO',
@@ -1780,35 +1675,126 @@
                 quote2: 'I want a day that feels like we\'re inside a photograph.',
                 timeOfDay: 'both',
                 umbrellaCategory: 'Golden Hour',
-                subCategory: 'Photography Locations'
+                subCategory: 'Photography Locations',
+                hidden: true  // Remove this line to show the pin on the map
             },
             {
-                name: 'Planetarium Show',
-                place: 'Upper West Side',
-                fullName: 'Hayden Planetarium (AMNH)',
-                address: 'Central Park West & 79th St, New York, NY 10024',
-                coords: [40.781, -73.974],
-                category: 'culture',
-                description: 'Journey through the cosmos in this state-of-the-art planetarium. Watch stars, planets, and galaxies unfold above you in immersive shows that make the universe feel intimate and infinite.',
-                quote1: 'Dark room, moving stars.',
-                quote2: 'I want one moment where the world feels bigger and it\'s still just us.',
+                name: 'Beach Evening at Rockaway',
+                place: 'Rockaway Beach',
+                fullName: 'Rockaway Beach',
+                address: 'Beach 97th St, Rockaway Beach, NY 11693',
+                coords: [40.583, -73.823],
+                category: 'views',
+                description: 'Wanna go to the beach with bhavii?? We can watch the sunset over the Atlantic, feel the saltyyy air and just beee together!!!.',
                 timeOfDay: 'both',
-                umbrellaCategory: 'Just for Us',
-                subCategory: 'Quiet Museums'
+                umbrellaCategory: 'Golden Hour',
+                subCategory: 'Waterfront Spots',
+                hidden: false  // Remove this line to show the pin on the map
+            },
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // SWEET MOMENTS - Cafés, Desserts & Cozy Spots
+            // ═══════════════════════════════════════════════════════════════════════════
+            {
+                name: 'Late-Night Dessert',
+                place: 'East Village',
+                fullName: "Veniero's Pasticceria & Caffé",
+                address: '342 E 11th St, New York, NY 10003',
+                coords: [40.7294715, -73.9844822],
+                category: 'treats',
+                description: 'A legendary Italian bakery serving classic pastries since 1894. Their cannoli, sfogliatelle, and tiramisu are perfect for satisfying late-night sweet cravings in the cozy, old-world atmosphere.',
+                timeOfDay: 'night',
+                umbrellaCategory: 'Sweet Moments',
+                subCategory: 'Dessert Spots',
+                hidden: false  // Remove this line to show the pin on the map
             },
             {
-                name: 'Wine Bar Tucked Away',
-                place: 'West Village',
-                fullName: 'Hidden Wine Bar',
-                address: 'West Village, New York, NY 10014',
-                coords: [40.733, -74.003],
+                name: 'Café-Hopping in SoHo',
+                place: 'SoHo',
+                fullName: 'SoHo Neighborhood',
+                address: 'SoHo, New York, NY 10012',
+                coords: [40.723, -74.000],
                 category: 'treats',
-                description: 'Find a quiet wine bar down a side street—candlelit, intimate, with a carefully curated wine list. The kind of place where conversation flows as smoothly as the wine.',
-                quote1: 'Low light, quiet conversations.',
-                quote2: 'I like nights that feel intimate without trying to be.',
-                timeOfDay: 'night',
-                umbrellaCategory: 'Just for Us',
-                subCategory: 'Intimate Bars'
+                description: 'Explore SoHo\'s trendy streets lined with boutiques, cast-iron buildings, and cozy cafés. Make it a slow day—espresso here, pastry there, people-watching everywhere.',
+                quote1: 'One drink becomes another.',
+                quote2: 'I want a day where we linger and don\'t rush anything.',
+                timeOfDay: 'day',
+                umbrellaCategory: 'Sweet Moments',
+                subCategory: 'Cozy Cafés',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // ADVENTURE TOGETHER - Activities, Exploration & Day Trips
+            // ═══════════════════════════════════════════════════════════════════════════
+            {
+                name: 'Get Lost in the West Village',
+                place: 'West Village',
+                fullName: 'Washington Square Park',
+                address: 'Washington Square, New York, NY 10012',
+                coords: [40.730824, -73.997330],
+                category: 'adventure',
+                description: 'Start at the iconic arch and wander through charming cobblestone streets lined with brownstones, hidden gardens, and cozy cafés. The West Village is made for getting delightfully lost together.',
+                timeOfDay: 'day',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Neighborhood Exploration',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Ferry Ride "to nowhere"',
+                place: 'Manhattan',
+                fullName: 'Staten Island Ferry / Whitehall Terminal',
+                address: '4 Whitehall St, New York, NY 10004',
+                coords: [40.7013332, -74.0133104],
+                category: 'adventure',
+                description: 'The free Staten Island Ferry offers breathtaking views of the Statue of Liberty, Ellis Island, and the Manhattan skyline. It\'s a 25-minute journey each way—perfect for an unexpected mini-adventure.',
+                timeOfDay: 'both',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Ferries / Water',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Coney Island Early Season',
+                place: 'Coney Island',
+                fullName: 'Luna Park',
+                address: '1000 Surf Ave, Brooklyn, NY 11224',
+                coords: [40.575245, -73.978577],
+                category: 'adventure',
+                description: 'NYC\'s iconic seaside amusement park with vintage rides, boardwalk games, and Nathan\'s Famous hot dogs. Visit early in the season for smaller crowds and that nostalgic carnival magic.',
+                timeOfDay: 'day',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Day Trips',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Flea Market Day',
+                place: 'Brooklyn',
+                fullName: 'Brooklyn Flea (Dumbo)',
+                address: '90 Kent Ave, Brooklyn, NY 11249',
+                coords: [40.706, -73.963],
+                category: 'adventure',
+                description: 'A beloved weekend market with vintage finds, antiques, handmade goods, and food vendors. Browse through treasures and quirky discoveries while enjoying the vibrant Brooklyn atmosphere.',
+                quote1: 'Old objects, strange treasures.',
+                quote2: 'I like the idea of finding something meaningless that becomes ours.',
+                timeOfDay: 'day',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Neighborhood Exploration',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Kayaking on the Hudson',
+                place: 'Hudson River Park',
+                fullName: 'Hudson River Park (Pier 26)',
+                address: 'Pier 26, Hudson River Park, New York, NY 10013',
+                coords: [40.718, -74.014],
+                category: 'adventure',
+                description: 'Free kayaking programs let you paddle along the Hudson with the Manhattan skyline as your backdrop. No experience needed—just adventure and a unique perspective of the city.',
+                quote1: 'Water close, skyline far.',
+                quote2: 'I want to see the city from somewhere unexpected with you.',
+                timeOfDay: 'day',
+                umbrellaCategory: 'Adventure Together',
+                subCategory: 'Physical Activities',
+                hidden: true  // Remove this line to show the pin on the map
             },
             {
                 name: 'Arcade / Board Game Café',
@@ -1822,37 +1808,148 @@
                 quote2: 'I want to see your serious face over something that doesn\'t matter.',
                 timeOfDay: 'both',
                 umbrellaCategory: 'Adventure Together',
-                subCategory: 'Neighborhood Exploration'
+                subCategory: 'Neighborhood Exploration',
+                hidden: true  // Remove this line to show the pin on the map
             },
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // JUST FOR US - Museums, Cultural Spots & Intimate Places
+            // ═══════════════════════════════════════════════════════════════════════════
             {
-                name: 'Beach Evening at Rockaway',
-                place: 'Rockaway Beach',
-                fullName: 'Rockaway Beach',
-                address: 'Beach 97th St, Rockaway Beach, NY 11693',
-                coords: [40.583, -73.823],
-                category: 'views',
-                description: 'NYC\'s best beach is just a train ride away. Watch the sunset over the Atlantic, feel the salt air, and remember that sometimes the city needs the ocean.',
-                quote1: 'Wind, ocean, nothing else.',
-                quote2: 'I want to sit beside you and listen to waves instead of the city.',
-                timeOfDay: 'both',
-                umbrellaCategory: 'Golden Hour',
-                subCategory: 'Waterfront Spots'
-            },
-            {
-                name: 'Write Notes to Each Other in a Park',
+                name: 'Outdoor Music',
                 place: 'Central Park',
-                fullName: 'The Mall (Central Park)',
-                address: 'The Mall, Central Park, New York, NY 10022',
-                coords: [40.771, -73.972],
-                category: 'nature',
-                description: 'The tree-lined promenade in Central Park is perfect for a quiet afternoon. Bring paper and pens, find a bench, and write notes, thoughts, or letters to each other—words to save and remember.',
-                quote1: 'I want to leave you words you can keep.',
+                fullName: 'Naumburg Bandshell',
+                address: 'Naumburg Bandshell, Central Park, New York, NY 10021',
+                coords: [40.772667, -73.971333],
+                category: 'culture',
+                description: 'An iconic outdoor amphitheater hosting free concerts and performances throughout the warmer months. Sit on the grass and let live music fill the air as you enjoy a perfect NYC evening together.',
+                timeOfDay: 'both',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Hidden Spots',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Chelsea Galleries',
+                place: 'Chelsea',
+                fullName: 'Gladstone Gallery',
+                address: '530 W 21st St, New York, NY 10011',
+                coords: [40.7489324, -74.0044772],
+                category: 'culture',
+                description: 'Chelsea is home to hundreds of contemporary art galleries. Spend an afternoon hopping between exhibitions—from cutting-edge installations to thought-provoking photography. Most are free to enter.',
                 timeOfDay: 'day',
-                umbrellaCategory: 'Blossoming Love',
-                subCategory: 'Walks / Scenic Routes'
-            }
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Quiet Museums',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Indie Film Night',
+                place: 'Greenwich Village',
+                fullName: 'IFC Center',
+                address: '323 6th Ave, New York, NY 10014',
+                coords: [40.7312056, -74.0016722],
+                category: 'culture',
+                description: 'A beloved indie cinema showing art-house films, foreign cinema, and documentaries. Grab tickets to something you\'ve never heard of and discover a new favorite film together.',
+                timeOfDay: 'both',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Hidden Spots',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'The Met Cloisters',
+                place: 'Fort Tryon Park',
+                fullName: 'The Met Cloisters',
+                address: '99 Margaret Corbin Dr, New York, NY 10040',
+                coords: [40.865, -73.932],
+                category: 'culture',
+                description: 'A branch of the Met dedicated to medieval European art and architecture. Built from actual medieval cloisters, the museum overlooks the Hudson River and feels like a castle transported to NYC.',
+                quote1: 'Stone walls, river views, silence.',
+                quote2: 'It feels like stepping into another century together.',
+                timeOfDay: 'day',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Quiet Museums',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Shakespeare in the Park',
+                place: 'Central Park',
+                fullName: 'Delacorte Theater',
+                address: 'Delacorte Theater, Central Park, New York, NY 10024',
+                coords: [40.779, -73.966],
+                category: 'culture',
+                description: 'Free outdoor performances of Shakespeare and other plays under the stars. Arrive early to get tickets, bring a blanket, and experience theater in one of NYC\'s most magical settings.',
+                quote1: 'Blankets, crowds, night air.',
+                quote2: 'I want to sit beside you while a story unfolds above us.',
+                timeOfDay: 'night',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Hidden Spots',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Museum of the City of New York',
+                place: 'Upper East Side',
+                fullName: 'Museum of the City of New York',
+                address: '1220 5th Ave, New York, NY 10029',
+                coords: [40.792, -73.952],
+                category: 'culture',
+                description: 'Discover the rich history of NYC through photographs, artifacts, and interactive exhibits. Learn about the city\'s evolution from Dutch colony to global metropolis—perfect for curious minds.',
+                quote1: 'Stories of how this place became what it is.',
+                quote2: 'I like learning a city with you instead of just walking through it.',
+                timeOfDay: 'day',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Quiet Museums',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Live Vinyl / Listening Bar Night',
+                place: 'Greenwich Village',
+                fullName: 'Village Vanguard',
+                address: '178 7th Ave S, New York, NY 10014',
+                coords: [40.738, -74.002],
+                category: 'culture',
+                description: 'A legendary jazz club that\'s been hosting world-class musicians since 1935. Sit in the intimate basement venue and let the music transport you—no phones, just pure listening.',
+                quote1: 'Music you don\'t know yet.',
+                quote2: 'I want to discover new sounds while sitting close to you.',
+                timeOfDay: 'night',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Intimate Bars',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Planetarium Show',
+                place: 'Upper West Side',
+                fullName: 'Hayden Planetarium (AMNH)',
+                address: 'Central Park West & 79th St, New York, NY 10024',
+                coords: [40.781, -73.974],
+                category: 'culture',
+                description: 'Journey through the cosmos in this state-of-the-art planetarium. Watch stars, planets, and galaxies unfold above you in immersive shows that make the universe feel intimate and infinite.',
+                quote1: 'Dark room, moving stars.',
+                quote2: 'I want one moment where the world feels bigger and it\'s still just us.',
+                timeOfDay: 'both',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Quiet Museums',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+            {
+                name: 'Wine Bar Tucked Away',
+                place: 'West Village',
+                fullName: 'Hidden Wine Bar',
+                address: 'West Village, New York, NY 10014',
+                coords: [40.733, -74.003],
+                category: 'treats',
+                description: 'Find a quiet wine bar down a side street—candlelit, intimate, with a carefully curated wine list. The kind of place where conversation flows as smoothly as the wine.',
+                quote1: 'Low light, quiet conversations.',
+                quote2: 'I like nights that feel intimate without trying to be.',
+                timeOfDay: 'night',
+                umbrellaCategory: 'Just for Us',
+                subCategory: 'Intimate Bars',
+                hidden: true  // Remove this line to show the pin on the map
+            },
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // END OF PINS - Add new pins above this line
+            // ═══════════════════════════════════════════════════════════════════════════
         ];
-        
+
         // Schema validation for umbrella and sub categories
         const validCategoryPairs = {
             'Blossoming Love': ['Parks & Gardens', 'Walks / Scenic Routes', 'Quiet Cafés', 'Viewpoints'],
@@ -2148,13 +2245,26 @@
         
         // Function to update progress tracker
         window.updateProgressTracker = function() {
-            // Count total activities (exclude home locations - first 2 in array)
-            const totalActivities = locations.length - 2; // Subtract 2 home locations
+            // Count total activities (exclude home locations and hidden pins)
+            const visibleActivities = locations.filter((loc, index) => {
+                // Exclude first 2 home locations
+                if (index < 2) return false;
+                // Exclude hidden pins
+                if (loc.hidden === true) return false;
+                return true;
+            });
             
-            // Count completed activities
+            const totalActivities = visibleActivities.length;
+            
+            // Count completed activities (only for visible, non-hidden pins)
             let completedCount = 0;
-            Object.keys(completedActivities).forEach(key => {
-                if (completedActivities[key] === true) {
+            locations.forEach((loc, index) => {
+                // Skip home locations (first 2)
+                if (index < 2) return;
+                // Skip hidden pins
+                if (loc.hidden === true) return;
+                // Count if completed
+                if (completedActivities[index] === true) {
                     completedCount++;
                 }
             });
@@ -2195,6 +2305,11 @@
         
         // Add markers to map
         locations.forEach((location, index) => {
+            // Skip hidden pins (controlled directly in code)
+            if (location.hidden === true) {
+                return; // Skip this pin entirely - won't appear on map
+            }
+            
             const isHome = location.place === 'Bhavi Home' || location.place === 'Bel Home';
             const isCompleted = completedActivities[index] || false;
             
